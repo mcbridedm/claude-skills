@@ -2,6 +2,13 @@
 
 All notable changes to this repository are recorded here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versions are per plugin, as set in each `plugin.json`, and follow [Semantic Versioning](https://semver.org/).
 
+## setup 0.2.1 - 2026-10-28
+
+### Changed
+
+- `practice-watch`: recommends the end state of each practice, not every step: items are grouped by practice, judged at their latest state, and earlier advice is recorded as **superseded** with what replaced it (a new verdict; a full-history run yields a short list of current practices). When a new item replaces an adopted practice, it recommends the change and what to remove.
+- `practice-watch`: captures what a source shares, not only what it writes: reposts (searched separately where author search leaves them out), quote posts, linked posts and images (alt text, or a look at tip-related images), credited to their real author, with the sharer counted as endorsing it.
+
 ## setup 0.2.0 - 2026-10-28
 
 ### Added

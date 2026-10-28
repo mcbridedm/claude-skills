@@ -1,7 +1,7 @@
 {
   "name": "setup",
   "displayName": "Setup",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Setup skills: sets up a project to use these skills (starter profiles, a section in CLAUDE.md or AGENTS.md, optional guardrails with a hook that refuses shell writes to protected paths), and keeps a Claude Code setup current by watching trusted sources for new practices, recommending them and codifying the ones adopted.",
   "author": {
     "name": "Devin McBride"

@@ -43,11 +43,15 @@ For each source (all, or those named in `$ARGUMENTS`), fetch items newer than th
 - **GitHub releases or commits:** `gh release list` / `gh api`.
 - **Sites that need a signed-in browser** (`via: browser`): use the browser tools on the user's signed-in session, reading only. For a person's full history, search their posts month by month (for example a site's `from:<handle> since:<date> until:<date>` search) rather than scrolling. If the browser can't read the site, stop that source and tell the user what to allow; never use mirrors or scrapers that copy walled content.
 
+**Capture what's shared, not only what's written.** A repost, a quote post, a linked post or an image is often the tip itself: keep the shared text (and its real author), image alt text, and for tip-related images without useful alt text, look at the image and summarise it. On sites whose author search leaves out reposts, search for them separately. Credit shared content to its author; the source sharing it counts as endorsing it, and a practitioner shared often becomes a candidate source.
+
 Keep an item when it's a working practice or a feature worth using: a workflow, a setting, a hook, a prompt pattern, a tool, a trap. Drop announcements, jokes, and anything already in the record. Give each kept item an id (`<source>:<post id or URL>`), its date and link, and a one-line summary.
 
 ## Step 3: Triage
 
-Judge each item with `reference/triage.md`: what it is, whether it's credible (who says it, how many trusted sources agree, whether the docs confirm it), whether the person already does it (cite the file and line), whether it fits their setup and risks, what it would cost, and where it would go (a route from the profile). Verdict: **recommend**, **already doing**, **not for you** (why), or **watch** (promising, wait for more evidence).
+**Recommend the end state, not every step.** Practices evolve: a later post, a new feature or a changed default can replace earlier advice. Group items by practice and judge the latest state of each; record the earlier ones as superseded (with what replaced them) instead of recommending them. A `full-history` run produces a short list of current practices, not one item per post.
+
+Judge each item with `reference/triage.md`: what it is, whether it's credible (who says it, how many trusted sources agree, whether the docs confirm it), whether the person already does it (cite the file and line), whether it fits their setup and risks, what it would cost, and where it would go (a route from the profile). Verdict: **recommend**, **already doing**, **not for you** (why), **watch** (promising, wait for more evidence), or **superseded** (replaced by a later practice or feature; name it). When a new item replaces a practice the person already adopted, recommend the change, and say what to remove.
 
 ## Step 4: Report and record
 

@@ -6,13 +6,13 @@ For each kept item, answer in a line each:
 
 1. **What it is:** the practice, in your own words, and the kind (workflow, setting, hook, prompt pattern, tool, habit, trap).
 2. **Credible?** Who says it and from what experience; whether the product's docs or release notes confirm it (check them); how many trusted sources say the same. One practitioner's untested idea is **watch**, not **recommend**.
-3. **Still true?** Check it against the current version (`claude --version`, the docs). Tips go stale when defaults change.
+3. **Still true, and still the latest?** Check it against the current version (`claude --version`, the docs) and against later items on the same practice, from this source or others. Tips go stale when defaults change or a feature replaces a workaround. If it's been replaced, the verdict is **superseded**, naming what replaced it.
 4. **Already doing it?** Search the setup files (Step 1). Cite the file and line if so. Partly doing it counts: say what's missing.
 5. **Does it fit?** Against the person's setup and risks: what it touches (credentials, live systems, outside services), the profile's "Not for me" list, and how they work (alone or in a team, in a terminal or remotely). A tip that weakens a safety measure needs a strong case.
 6. **Cost:** S (a line or a setting), M (a hook, a rule file, a script with a test), L (a new skill or a workflow change).
 7. **Where it would go:** the profile route, or "unrouted" with a suggestion.
 
-Verdicts: **recommend**, **already doing**, **not for you** (with why), **watch** (promising; say what evidence would settle it).
+Verdicts: **recommend**, **already doing**, **not for you** (with why), **watch** (promising; say what evidence would settle it), **superseded** (with what replaced it).
 
 ## The report
 
@@ -34,6 +34,9 @@ Sources checked: <n> (<names>); items found: <n>; kept: <n>. Unreadable: <source
 
 ## Watch
 - <practice>: <what would settle it> ([source](link))
+
+## Superseded
+- <earlier advice> → <what replaced it> ([source](link)); <if adopted earlier: what to remove>
 
 ## Candidate sources
 - <name> (<where>): cited by <who>; <why worth following>
