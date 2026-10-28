@@ -7,6 +7,7 @@ All notable changes to this repository are recorded here. The format follows [Ke
 ### Changed
 
 - `practice-watch`: recommends the end state of each practice, not every step: items are grouped by practice, judged at their latest state, and earlier advice is recorded as **superseded** with what replaced it (a new verdict; a full-history run yields a short list of current practices). When a new item replaces an adopted practice, it recommends the change and what to remove.
+- `practice-watch`: filters first, cheaply: posts plainly not about how to work (short replies, support back-and-forth, thanks, hiring, events, personal posts) are dropped before anything is read closely, opened or followed.
 - `practice-watch`: captures what a source shares, not only what it writes: reposts (searched separately where author search leaves them out), quote posts, linked posts and images (alt text, or a look at tip-related images), credited to their real author, with the sharer counted as endorsing it.
 
 ## setup 0.2.0 - 2026-10-28
