@@ -13,7 +13,7 @@ You are the project's documentation lead after a working session. Code and proje
 - **Validate before you edit.** Auditors can be confidently wrong. Nothing changes until you've checked it yourself (Step 4).
 - **Change only documents.** Code bugs found on the way are reported, never fixed here. Settings files count as documents only for their comments.
 - **Respect each group's kind:** ledgers get dated notes or new entries, never rewrites; generated files are regenerated, never hand-edited; external systems are checked, never changed.
-- **Never two agents on the same file.**
+- **Agents read; only you write.** Auditors and fix drafters are read-only by their tool list and return text; you make every edit, and never assign one file to two drafters.
 - **Ask before editing paths the project's rules protect** (the profile's `ask_before`, or the project's own instructions).
 - **Commit and push only as the profile says.** Default: commit, never push.
 
@@ -22,7 +22,7 @@ Project specifics come from the project's profile at `.claude/docs-sync.md` (Ste
 Supporting files; read them when a step points to them:
 - `${CLAUDE_SKILL_DIR}/reference/profile-format.md`: the profile's settings, group kinds, change kinds and defaults.
 - `${CLAUDE_SKILL_DIR}/reference/example-profile.md`: a filled-in example, also the starting point for a starter profile.
-- `${CLAUDE_SKILL_DIR}/reference/auditor-brief.md`: the brief for auditors and fixers, and the finding format.
+- `${CLAUDE_SKILL_DIR}/reference/auditor-brief.md`: the briefs for auditors and fix drafters, and the finding format.
 
 ## Step C: Context check (first, before anything costly)
 
@@ -72,20 +72,21 @@ Build the work list: which document items this change set may have made stale, a
    A doc that matches is added to the work list even if no trigger named it. A match outside every group is a candidate for Step 7.
 4. **Generated groups:** for each, decide whether its sources changed (its triggers). If they did, it needs regenerating in Step 5; it isn't audited by an agent.
 5. **External groups:** list which checks the change set calls for (e.g. a new alarm should exist in the incident tool). They're checked read-only in Step 3.
-6. **Show the work list** in brief: per group, the triggered files and the reason in a few words. Then go on, unless it's very large (more than about 60 files outside `all`); then ask whether to narrow it.
+6. **Save the diffs auditors need.** Auditors have no shell (Step 3), so for each group run `git diff <base> <head> -- <the changed paths its triggers matched>` and save it as `<diff_dir>/<group>.diff`, where `<diff_dir>` is `<git dir>/docs-sync/<head short>/` and `<git dir>` is `git rev-parse --absolute-git-dir`. Inside the git directory the files are never tracked or committed and don't show in `git status`; delete them in Step 8. Skip this for `all`.
+7. **Show the work list** in brief: per group, the triggered files and the reason in a few words. Then go on, unless it's very large (more than about 60 files outside `all`); then ask whether to narrow it.
 
 ## Step 3: Audit in parallel
 
 Send one auditor per triggered group, **all in a single message** so they run at once:
 - At most the profile's `max_auditors` (default 6). Merge the smallest groups to fit; split a group with more than about 25 triggered files.
-- Use a read-only agent type (`Plan` or `Explore`). Their shells can still write, so the brief forbids it and you check afterwards.
-- Give each the auditor brief in `reference/auditor-brief.md`, filled in: the group, its kind and rules, its files with what each is the source of truth for, the triggered items and reasons, the change summary, the relevant claims from Step 2, and the group's checks.
+- Use `subagent_type: "docs:reviewer"`, this plugin's reviewer agent. Its only tools are Read, Grep and Glob: no shell, no editing, no web, so read-only is enforced, not just asked for. Commands a check needs (a `--help`, a generator, a count) are yours, in Step 4. (If that agent isn't available, e.g. the skill was copied without its plugin, use the most read-only agent type there is, such as `Plan` or `Explore`, and rely on the brief and the check below.)
+- Give each the auditor brief in `reference/auditor-brief.md`, filled in: the group, its kind and rules, its files with what each is the source of truth for, the triggered items and reasons, the change summary and the path of its saved diff, the relevant claims from Step 2, and the group's checks. Auditors return findings in their reply; you write every file.
 - **Ledger groups:** the auditor may propose only a dated note under an existing entry, a new entry, or an index row. Never a rewrite of what's recorded.
-- **External groups:** you check these yourself, read-only, with whatever tool or CLI the profile names (or one read-only agent if the checks are many). Record differences as findings with the fix the maintainer would make; never change the external system.
+- **External groups:** you check these yourself, read-only, with whatever tool or CLI the profile names; the reviewer agent has no access to them. Record differences as findings with the fix the maintainer would make; never change the external system.
 
 If an auditor fails or returns something off-format, re-run it once. If it fails again, say so in the report and carry on; never write its audit yourself.
 
-Afterwards compare `git status --porcelain` with Step 1. If an auditor created or changed a file, revert only that, and say so.
+Afterwards compare `git status --porcelain` with Step 1 (a backstop for the fallback agent type). If an auditor created or changed a file, revert only that, and say so.
 
 ## Step 4: Validate every finding
 
@@ -101,14 +102,14 @@ If the argument was `audit-only`, skip to Step 8 now: report, no edits, no marke
 
 ## Step 5: Fix
 
-1. **Plan the edits.** Assign every file to exactly one editor: you, or one fixer agent per group (for large runs, more than about 15 files to edit). A file named by two groups goes to the first group that lists it. **Never two agents on the same file.**
+1. **Plan the edits.** You make every edit yourself; no agent writes. Most findings already carry the corrected text, ready to paste. For a large run (more than about 15 files to edit, many with only the intent given), you may first send one fix drafter per group (`docs:reviewer`, the fix drafter brief in `reference/auditor-brief.md`) to return exact replacements, then apply them. A file named by two groups goes to the first group that lists it. **Never two drafters on the same file.**
 2. **Ask first where the rules say so.** Collect the edits that touch `ask_before` paths (or paths the project's instructions protect) into one question to the user: each edit in a line, with your recommendation to apply it and why. Apply only what they approve. Don't route around the protection with shell edits.
 3. **Apply by kind:**
    - **docs:** the corrected text, in the project's writing style and the file's own format. Keep "last verified" or "last updated" lines current where the file has them.
    - **ledger:** a dated note (`YYYY-MM-DD: ...`) under the entry, a new entry in the ledger's format, or an index row. A new decision that needs a new record (an ADR) is proposed to the maintainer, not written, unless the project's rules say the docs sync writes them.
    - **generated:** run the group's `regenerate` command; never hand-edit. If it needs network or credentials and fails, report it.
    - **external:** never. Report the fix for the maintainer.
-4. **Fixer agents** (when used) get the fixer brief in `reference/auditor-brief.md`: only the validated findings for their files, the exact corrected text where you have it, their file list, and "edit only these files". Use an agent type that can edit; run them in one message.
+4. **Fix drafters** (when used) get the fix drafter brief: only the validated findings for their files, the exact corrected text where you have it, and their file list. Run them in one message. Each returns, per file, exact `old text` / `new text` pairs; check each pair against the finding it answers, then apply it with your own edit tool.
 5. Afterwards, check that `git status --porcelain` shows changes only in files you planned to edit. Revert anything else.
 
 ## Step 6: Verify
@@ -124,6 +125,8 @@ Run the profile's `checks` (default: the project's lint and test commands, if fo
 - **Profile upkeep:** propose additions to `.claude/docs-sync.md`: state-holding documents no group covers (from Step 2's grep, or new docs added in the range), triggers that missed a doc an auditor found stale, groups whose paths no longer exist. Write the profile change only if the user agrees; it's the project's file, never this skill's.
 
 ## Step 8: Report, marker and hand off
+
+First delete the saved diffs (`<diff_dir>`, Step 2), on every run, `audit-only` included.
 
 1. **Marker:** write the head SHA to the profile's `marker` path (default `docs/.last-docs-sync`), only after a complete run with checks green. A partial, failed or `audit-only` run leaves it where it was.
 2. **Commit** if the profile's `commit` is true (the default with a profile; without one, only if the user said so): stage only the files this run edited and the marker (never `git add -A`), in one commit with the profile's `commit_message` (default `Docs sync: <base short>..<head short>`), ending with the repository's attribution line. **Push** only if the profile's `push` is true (default false).

@@ -64,7 +64,7 @@ Then, before dispatching:
 
 ## Step 3: Dispatch the reviewers
 
-Send one Agent call per reviewer **in a single message** so they run concurrently. Use `subagent_type: "Plan"`: it can read, search and research, but has no file-editing tools. Its shell can still write, so the brief forbids it and Step 4 checks. (If Plan isn't available, use the most read-only agent type there is.)
+Send one Agent call per reviewer **in a single message** so they run concurrently. Use `subagent_type: "architecture:reviewer"`, this plugin's reviewer agent: its only tools are Read, Grep, Glob, WebFetch and WebSearch, so it can read, search and research but has no shell and can't edit, write or run anything. Anything that needs a command is yours, in Step 4b. (If that agent isn't available, e.g. the skill was copied without its plugin, use the most read-only agent type there is, such as `Plan`, and rely on the brief and Step 4's check.)
 
 Each gets this brief with its persona filled in. Replace the `<...>` placeholders; drop a bracketed line whose condition doesn't hold. Reviewers don't share your conversation, so the design goes **inline**: it's short, and it may not be saved yet.
 
@@ -86,9 +86,10 @@ area map's "Read" lines, each with a few words on why>
 
 Judge the design, not the code as it stands. The code tells you what the design must fit
 with and what already exists; a gap in today's code is a finding only if this design depends
-on it or makes it worse. Cite file paths (with line numbers where useful). Do not create, edit
-or delete any file, and run read-only commands only (no installs, builds, tests or git
-commands that change state).
+on it or makes it worse. Cite file paths (with line numbers where useful). You have no shell
+and no editing tools: read and search instead of running commands, and return your review in
+your reply rather than saving it. If a risk can only be settled by running something (a test,
+a query plan, a count), say what to run in its evidence; the lead runs it.
 
 Be proportionate. <STAGE: the profile's `stage`, e.g. "pre-launch, small team">. Judge against
 <PROJECT>'s principles<, from PRINCIPLES FILE>: <PRINCIPLES>. A change you ask for that adds
@@ -125,7 +126,7 @@ If a reviewer fails or returns something off-format, re-run that one once. If it
 
 ## Step 4: Collect and merge
 
-1. **Check nothing changed:** compare `git status --porcelain` with Step 1. If a reviewer created or changed a file, revert only that, and say so.
+1. **Check nothing changed:** compare `git status --porcelain` with Step 1 (a backstop: the reviewer agent can't write, but a fallback agent type can). If a reviewer created or changed a file, revert only that, and say so.
 2. **Merge:** deduplicate risks and changes across reviewers (one entry, with every reviewer who raised it). Keep each reviewer's verdict.
 3. **Disagreements:** where reviewers conflict (one wants a queue, another says YAGNI; one says ship, another says rethink), note both positions and the reason behind each. You decide in Step 5.
 

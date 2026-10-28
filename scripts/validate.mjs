@@ -81,6 +81,24 @@ if (market) {
         fail(`CHANGELOG.md: no entry mentions ${entry.name}'s version ${manifest.version}`);
     }
     if (!existsSync(join(pdir, "README.md"))) fail(`${rel(pdir)}: README.md missing`);
+    // Plugin agents (agents/*.md): name, description and an explicit tools list, so a review
+    // agent's read-only access is enforced by what it's granted. A shell can't be made
+    // read-only by a tool list, so an agent granted Bash must say so in its description.
+    const adir = join(pdir, "agents");
+    const agentFiles = existsSync(adir) ? readdirSync(adir).filter((f) => f.endsWith(".md")) : [];
+    for (const file of agentFiles) {
+      const apath = join(adir, file);
+      const afm = frontMatter(apath);
+      if (!afm) {
+        fail(`${rel(apath)}: no YAML front matter`);
+        continue;
+      }
+      for (const key of ["name", "description", "tools"]) if (!afm[key]) fail(`${rel(apath)}: front matter has no ${key}`);
+      if (afm.name && afm.name !== file.replace(/\.md$/, "")) fail(`${rel(apath)}: name "${afm.name}" differs from file name`);
+      if (afm.name && !/^[a-z0-9]+(-[a-z0-9]+)*$/.test(afm.name)) fail(`${rel(apath)}: name must be kebab-case`);
+      if (afm.tools && /\bBash\b/.test(afm.tools) && !/\bBash\b/.test(afm.description ?? ""))
+        fail(`${rel(apath)}: grants Bash; say so in its description`);
+    }
     const skills = dirs(join(pdir, "skills"));
     if (skills.length === 0) warnings.push(`${rel(pdir)}: no skills/ folders`);
     for (const skill of skills) {

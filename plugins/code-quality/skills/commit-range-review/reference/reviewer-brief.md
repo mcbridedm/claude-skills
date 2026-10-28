@@ -13,12 +13,14 @@ breaking one is a finding.
 
 Your slice: <slice name>
 Files: <list, with changed-line counts>
-See the changes: git diff <base> <head> -- <paths>
-Read the surrounding code too: a change is wrong in context more often than in itself.
+The changes: <diff_dir>/<slice>.diff (git diff <base> <head> for your paths)
+The code at <head>: <checkout path>. Read the surrounding code too: a change is wrong in
+context more often than in itself.
 
-Do not create, edit or delete files, and run read-only commands only. You may run the
-project's existing tests for your slice if they're quick, and read dependencies' source
-(node_modules, vendored code) to check how a library behaves.
+You have no shell and no editing tools: read and search only. Return your findings in your
+reply; never try to save them. You may read dependencies' source (node_modules, vendored
+code) to check how a library behaves. Where a test or command would prove a finding, say
+what to run and what result proves it, in its evidence; the lead runs it.
 
 What to look for, in order: <the list in what-to-look-for.md, plus the profile's focus>.
 
@@ -28,7 +30,7 @@ Return findings only, in this shape, most severe first, at most 12:
   severity: critical | high | medium | low
   category: correctness | security | data | concurrency | contract | tests | rules | docs
   scenario: <concrete inputs or state, and what goes wrong for whom>
-  evidence: <the lines, and any test you ran with its output>
+  evidence: <the lines, and any test or command the lead should run to prove it>
   confidence: high | medium | low
 
 If you find nothing that clears the bar, say "No findings" and list what you checked in two
@@ -41,11 +43,12 @@ Replace "Your slice" with:
 
 ```
 Your slice: what no single slice sees.
-- Each merge's conflict resolution: <merge SHAs>. See `git show --remerge-diff <sha>`. Did
+- Each merge's conflict resolution: <merge SHAs>, each saved as
+  <diff_dir>/merge-<short sha>.diff (`git show --remerge-diff`). Did
   combining two correct sides produce something wrong: a duplicated or dropped line, two
   incompatible changes to one contract, a test edited to match a broken result?
 - Contracts between slices: an event, API, schema, setting or config key changed in one slice
-  and used in another (search for its name across the whole range).
+  and used in another (search for its name across the saved diffs and the code at <head>).
 - Tests changed in the same commit as the code they test, where the assertion was loosened.
 - Documentation or state files that now say something false.
 ```

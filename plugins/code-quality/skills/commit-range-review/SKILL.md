@@ -62,12 +62,17 @@ Build a short context file for the reviewers, at `<report_dir>/<run>/context.md`
 3. **Merges:** `git log --merges <base>..<head>`. For each merge, look at how its conflicts were resolved: `git show --remerge-diff <merge>` (Git 2.36 or later; otherwise compare the merge with both parents). Conflict resolutions are where two correct branches combine into a wrong one: list them for the cross-cutting reviewer.
 4. **Partition** the changed files into slices by area: top-level app, package or module, keeping a file's tests with it. Aim for slices a reviewer can read in full: at most the profile's `slice_max_lines` changed lines (default 2,500) and `slice_max_files` files (default 40). Split bigger areas by sub-folder. Cap the number of slices at `max_reviewers` (default 8) by merging the smallest. If the whole range is small (under one slice), use a single reviewer and skip Step 3's cross-cutting reviewer.
 5. **Rules:** list the project's own rules a reviewer should check against: the profile's `rules` section, plus the convention files you found (by path; reviewers read them).
-6. **Write `context.md`:**
+6. **Save what reviewers would otherwise run.** Reviewers have no shell (Step 3), so you run the commands and save their output for them in `<diff_dir>`: `<git dir>/commit-range-review/<run>/`, where `<git dir>` is `git rev-parse --absolute-git-dir`. Inside the git directory the files are never tracked, never committed and don't show in `git status`; delete them in Step 6.
+   - per slice, `git diff <base> <head> -- <slice paths>` to `<slice>.diff`;
+   - per merge, `git show --remerge-diff <merge>` to `merge-<short sha>.diff`, for the cross-cutting reviewer.
+7. **Code at the head.** Reviewers read surrounding code from a checkout, so it must be at `<head>`. If the working tree isn't at `<head>` or isn't clean, make a temporary worktree (`git worktree add --detach <tmp> <head>`), give reviewers its path, and remove it in Step 6.
+8. **Write `context.md`:**
    - the range;
    - the commit list;
-   - the slices (files and line counts);
-   - the merge list;
+   - the slices (files, line counts and the path of each slice's diff);
+   - the merge list, with their diff paths;
    - the rules files;
+   - the checkout reviewers read (the repository, or the worktree);
    - the profile's `focus`, if any.
 
    Keep it to facts; no opinions.
@@ -75,15 +80,15 @@ Build a short context file for the reviewers, at `<report_dir>/<run>/context.md`
 ## Step 3: Review the slices in parallel
 
 Send one reviewer per slice, **all in a single message** so they run at once:
-- Use a read-only agent type if one exists (e.g. `Plan` or `Explore`). Otherwise brief them not to edit.
-- Give each the brief in `reviewer-brief.md`, filled in for its slice. It points the reviewer at `context.md` by path; don't paste it.
+- Use `subagent_type: "code-quality:reviewer"`, this plugin's reviewer agent. Its only tools are Read, Grep and Glob: no shell, no editing, no web, so read-only is enforced, not just asked for. It reads the diffs you saved in Step 2 and the code at the head; tests and other commands are yours, in Step 4. (If that agent isn't available, e.g. the skill was copied without its plugin, use the most read-only agent type there is, such as `Plan` or `Explore`, and rely on the brief and the check below.)
+- Give each the brief in `reviewer-brief.md`, filled in for its slice. It points the reviewer at `context.md` and its diff by path; don't paste them. Reviewers return findings in their reply; you write every file.
 
 Add one **cross-cutting reviewer** for whatever no single slice sees:
 - how the merges resolved their conflicts;
 - contracts between slices (an event, API, schema or config changed on one side and used on another);
 - tests changed together with the code they test, where a test was loosened to pass.
 
-After they finish, compare `git status --porcelain` with before you started. If any reviewer changed a file, revert only that change and note it in the report.
+After they finish, compare `git status --porcelain` with before you started (a backstop for the fallback agent type). If any reviewer changed a file, revert only that change and note it in the report.
 
 ## Step 4: Verify every finding
 
@@ -128,7 +133,8 @@ Run the profile's `checks` (default: the project's lint, typecheck and test comm
 2. **Add a row to `<report_dir>/README.md`**, the index, creating it if needed: date, range, commit count, findings by severity, and a link.
 3. **Move the marker to the head SHA:** a one-line file at the profile's `marker` path (default `<report_dir>/LAST_REVIEWED`) holding the SHA. Move it only after the report is written. A failed or partial run leaves the marker where it was.
 4. **Record follow-ups** where the profile's `followups` setting says (e.g. a checklist section in a roadmap file), one line per finding the user hasn't fixed, with its id.
-5. **Commit** the report, the index, the marker and the follow-ups if the profile's `commit` is true (the default). Push only if its `push` is true.
+5. **Delete the saved diffs** (`<diff_dir>`) and remove the temporary worktree if you made one.
+6. **Commit** the report, the index, the marker and the follow-ups if the profile's `commit` is true (the default). Push only if its `push` is true.
 
 ## Step 7: Fixes, if asked
 

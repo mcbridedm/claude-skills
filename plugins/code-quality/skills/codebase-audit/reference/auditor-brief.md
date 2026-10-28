@@ -15,13 +15,15 @@ Read first, in this order:
    settings, commands, error answers. You'll check each one.
 
 Your slice: <slice name>
-Files (read every one in full, at <sha>; `git show <sha>:<path>` if your checkout differs):
+The code at <sha> is checked out at <checkout path>; read every path there.
+Files (read every one in full):
 <list, with line counts>
 Read neighbouring code where a file calls out of your slice: wrong in context is common.
 
-Do not create, edit or delete files, and run read-only commands only. You may run the
-project's existing tests for your slice if they're quick, and read dependencies' source to
-check how a library behaves.
+You have no shell and no editing tools: read and search only. Return your findings and the
+lists below in your reply; never try to save them. You may read dependencies' source to check
+how a library behaves. Where a test or command would prove a finding, say what to run and
+what result proves it, in its evidence; the lead runs it.
 
 What to look for, in order:
 1. Conformance: a claim in a governing document that the code doesn't keep, or code behaviour
@@ -46,7 +48,7 @@ Return, most severe first, at most 15 findings:
   kind: conformance | rule | correctness | security | data | tests | dead-code | governance-gap
   wrong side (conformance only): code | document | can't tell
   scenario: <concrete inputs or state, and what goes wrong for whom>
-  evidence: <the lines on each side, and any test you ran with its output>
+  evidence: <the lines on each side, and any test or command the lead should run to prove it>
   confidence: high | medium | low
 
 Then, always:

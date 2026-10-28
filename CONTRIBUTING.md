@@ -22,11 +22,14 @@ A skill belongs here when it's useful on many repositories. Everything specific 
 plugins/<kind>/                     one plugin per kind: architecture, testing, release, security, docs, ...
   .claude-plugin/plugin.json
   README.md
+  agents/<name>.md                  optional: sub-agents the plugin's skills dispatch
   skills/<skill-name>/
     SKILL.md
     README.md
     reference/                      optional
 ```
+
+- **Agents:** a skill that sends sub-agents to read and judge (reviewers, auditors) dispatches the plugin's own agent, e.g. `subagent_type: "<kind>:reviewer"`, whose `tools` list grants only what the job needs (Read, Grep, Glob; WebFetch and WebSearch only if it researches). That makes read-only enforced, not just asked for. Sub-agents return their output; the lead writes every file and runs every command, saving any output they need (diffs, check results) where they can read it. Give an agent Bash only when it can't be avoided, and then say so in its description and in the skill: a tool list can't make a shell read-only. Front matter needs `name` (the file name), `description` and `tools`; plugin agents ignore `permissionMode`, `hooks` and `mcpServers`. Keep the brief's prose rule as well, and the lead's `git status` check, for the fallback when the agent isn't available.
 
 - **Kind:** a short kebab-case noun. Add a skill to an existing kind when it fits; a new kind is a new plugin, with its own `plugin.json`, `README.md` and an entry in `.claude-plugin/marketplace.json`.
 - **Skill name:** kebab-case, at most 64 characters, the same as its folder, and specific enough to read well without the plugin prefix (`architecture-review`, not `review`). Plugin names must not start with `claude-` or `anthropic-` (reserved).

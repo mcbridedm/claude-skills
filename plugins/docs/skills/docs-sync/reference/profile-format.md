@@ -82,7 +82,7 @@ Maps paths to change kinds, so triggers can name kinds instead of paths. Default
 
 ### `## Rules` (optional)
 
-The project's rules about docs, or paths to where they are (e.g. "CLAUDE.md, 'Keeping state accurate'"). Auditors and fixers get them.
+The project's rules about docs, or paths to where they are (e.g. "CLAUDE.md, 'Keeping state accurate'"). Auditors and fix drafters get them.
 
 ### `## Archiving` (optional)
 

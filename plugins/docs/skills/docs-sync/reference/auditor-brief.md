@@ -1,6 +1,6 @@
-# Auditor and fixer briefs: docs-sync
+# Auditor and fix drafter briefs: docs-sync
 
-Fill in the `<...>` placeholders. Drop a bracketed line whose condition doesn't hold. Auditors don't share your conversation: everything they need is in the brief or in a file it points to.
+Fill in the `<...>` placeholders. Drop a bracketed line whose condition doesn't hold. Auditors don't share your conversation: everything they need is in the brief or in a file it points to. Both briefs go to the `docs:reviewer` agent, which can only read and search: no shell, no editing. Every file is written by the lead.
 
 ## Auditor brief (Step 3)
 
@@ -19,7 +19,8 @@ Files in the group, and what each is the source of truth for:
 
 What changed (<base short>..<head short>, <n> commits):
 <the change summary from Step 2: changed areas, change kinds, renamed and deleted paths, in a
-few lines; plus "git diff <base> <head> -- <paths>" for detail>
+few lines>
+The diff, for detail: <diff_dir>/<group>.diff (git diff <base> <head> for the matched paths)
 
 Triggered items, and why:
 <- path (or path section): the matching change>
@@ -38,9 +39,11 @@ style or wording you'd prefer. A fact that belongs in another document (by the "
 truth" lines) is a finding only if this file contradicts it; suggest a link instead of a copy.
 If you notice a bug in the code itself, list it under "Code issues" in a line; don't chase it.
 
-Do not create, edit or delete any file. Run read-only commands only (no installs, builds,
-tests that write, or git commands that change state). Never read or quote personal data or
-secrets; if a check needs data, say which count would settle it.
+You have no shell and no editing tools: read and search only, and return everything in your
+reply. Where a claim can only be settled by running something (a command's --help, a
+generator, a count), say what to run and what result settles it, in the evidence; the lead
+runs it. Never read or quote personal data or secrets; if a check needs data, say which
+count would settle it.
 
 Return exactly this shape, no preamble:
 
@@ -49,8 +52,8 @@ Return exactly this shape, no preamble:
 One block per finding, worst first:
 - **<id: G-NN>** `<path>:<line>`
   - **Wrong:** the text as it stands (quoted, short), or "missing: <what>"
-  - **Evidence:** file:line in the code, a command and its output, or the doc that is the
-    source of truth
+  - **Evidence:** file:line in the code, the doc that is the source of truth, or the command
+    the lead should run and the result that would settle it
   - **Fix:** the corrected text, ready to paste (for a ledger: the dated note or new entry)
   - **Confidence:** high / medium / low
 ### Code issues
@@ -59,13 +62,13 @@ One block per finding, worst first:
 <what you couldn't check and why, or "none">
 ```
 
-## Fixer brief (Step 5, large runs only)
+## Fix drafter brief (Step 5, large runs only)
 
 ```
-You are applying validated documentation fixes in <PROJECT>, at <absolute repo path>.
+You are drafting validated documentation fixes in <PROJECT>, at <absolute repo path>. You
+don't edit anything: you return exact replacements, and the lead applies them.
 
-Edit only these files: <list>. Do not touch any other file, and do not run commands that
-change files other than these.
+Your files: <list>. Draft changes for these only.
 
 Group: <GROUP NAME> (kind: <docs | ledger>). Rules: <the group's rules>.
 Writing style: <the project's style rule, or "match the surrounding text">.
@@ -73,13 +76,18 @@ Writing style: <the project's style rule, or "match the surrounding text">.
 Fixes, each already validated by the lead:
 <- path:line: the change; the exact corrected text where given>
 
-Apply each fix exactly where given; where only the intent is given, write it in the file's
-own style and format. Keep "last verified" or "last updated" lines current (<today>,
-<head short>) where the file has them. For a ledger, add dated notes or entries; never
-rewrite what is recorded. Don't fix anything else you notice: list it in your reply instead.
+For each fix, read the file and draft it exactly where given; where only the intent is
+given, write it in the file's own style and format. Include updates to "last verified" or
+"last updated" lines (<today>, <head short>) where the file has them. For a ledger, draft
+dated notes or entries; never a rewrite of what is recorded. Don't draft anything else you
+notice: list it at the end instead.
 
-Reply with: each file and what you changed, in a line; anything you couldn't apply and why;
-anything else you noticed.
+Reply with, per file:
+### <path>
+- fix <id>:
+  old: <the exact current text, copied from the file, long enough to occur only once>
+  new: <the replacement text>
+Then: anything you couldn't draft and why; anything else you noticed.
 ```
 
 ## Finding ids

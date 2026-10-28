@@ -35,7 +35,7 @@ Before Step P's heavier work, and before any agent, write or command with side e
 
 ## Step 1: Pin the snapshot and inventory it
 
-1. **Pin the commit:** the argument's ref, else the profile's branch tip. Record its full SHA and date. Everything below reads that commit. If the working tree isn't clean or isn't at it, audit the commit through a temporary worktree (`git worktree add --detach <tmp> <sha>`) so nobody's work in progress is read, and remove it at the end.
+1. **Pin the commit:** the argument's ref, else the profile's branch tip. Record its full SHA and date. Everything below reads that commit. If the working tree isn't clean or isn't at it, audit the commit through a temporary worktree (`git worktree add --detach <tmp> <sha>`) so nobody's work in progress is read, and remove it at the end. Auditors have no shell, so they can't `git show` an older commit: they read this checkout, and you give them its path.
 2. **Inventory:** `git ls-files` at the pinned commit, minus the profile's `skip` globs (generated files, lockfiles, vendored code, binaries). Count lines per file. Record the skipped paths and why.
 3. If the argument names areas, audit only those, and say so in the report's first line. Otherwise audit everything.
 4. Say it in one line before going on: the SHA, the date, files and lines to audit, files skipped.
@@ -66,10 +66,10 @@ Build the **governance map**: for each area of the code, the documents that say 
 ## Step 4: Audit in waves
 
 For each wave, send one auditor per slice **in a single message** so they run at once:
-- a read-only agent type if one exists, else a brief not to edit;
-- the brief in `auditor-brief.md`, filled in for its slice: its files, its governing documents, the rules files, the pinned SHA, and the paths to `governance.md`. Don't paste documents; give paths.
+- `subagent_type: "code-quality:reviewer"`, this plugin's reviewer agent. Its only tools are Read, Grep and Glob: no shell, no editing, no web, so read-only is enforced, not just asked for. It reads the checkout at the pinned commit (the repository, or Step 1's worktree); tests and other commands are yours, in Steps 5 and 7. (If that agent isn't available, e.g. the skill was copied without its plugin, use the most read-only agent type there is, such as `Plan` or `Explore`, and rely on the brief and the check below.)
+- the brief in `auditor-brief.md`, filled in for its slice: its files, its governing documents, the rules files, the pinned SHA, the checkout path, and the path to `governance.md`. Don't paste documents; give paths.
 
-Each auditor returns findings and the list of files it read in full. After each wave, check `git status --porcelain`: if an auditor changed a file, revert only that change and note it.
+Each auditor returns findings and the list of files it read in full, in its reply; you write every file. After each wave, check `git status --porcelain` (a backstop for the fallback agent type): if an auditor changed a file, revert only that change and note it.
 
 ## Step 5: Verify every finding
 

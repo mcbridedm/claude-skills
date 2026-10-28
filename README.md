@@ -184,7 +184,9 @@ These skills are expensive to run, in a fresh session or not, so each one first 
 .claude-plugin/marketplace.json     the marketplace: one entry per plugin (kind)
 plugins/<kind>/
   .claude-plugin/plugin.json        the plugin's name, version, description
-  README.md                         the kind's skills
+  README.md                         the kind's skills and agents
+  agents/<name>.md                  sub-agents the skills dispatch, e.g. a read-only reviewer
+                                    (front matter: name, description, tools); scoped as <kind>:<name>
   skills/<skill-name>/
     SKILL.md                        the skill (short; front matter + steps)
     README.md                       what it does, cost, when to run it, sample output

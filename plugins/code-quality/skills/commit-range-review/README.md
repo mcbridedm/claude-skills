@@ -34,8 +34,9 @@ For a pull request or your own uncommitted work, `/code-review` is the right too
    - lists the commits, noting which an AI agent co-wrote;
    - sizes the change;
    - finds the merges and how their conflicts were resolved (`git show --remerge-diff`);
-   - splits the changed files into slices by area.
-4. **Review:** one read-only reviewer per slice, in parallel (eight by default), plus a cross-cutting reviewer for merge resolutions, contracts between slices, and tests loosened alongside their code. It checks afterwards that no reviewer changed a file.
+   - splits the changed files into slices by area;
+   - saves each slice's diff and each merge's resolution where reviewers can read them (inside the git directory, never committed).
+4. **Review:** one read-only reviewer per slice, in parallel (eight by default), plus a cross-cutting reviewer for merge resolutions, contracts between slices, and tests loosened alongside their code. Reviewers are the plugin's `code-quality:reviewer` agent: Read, Grep and Glob only, no shell, editing or web, so read-only is enforced by its tool list; tests and commands are the lead's. It still checks afterwards that no file changed.
 5. **Verify:** the lead reads every finding at the cited lines and proves it when it can, by running a test or writing a throwaway one. It marks each CONFIRMED or PLAUSIBLE, or drops it with the reason. Findings that only disagree with a recorded decision (an ADR) are dropped.
 6. **Checks:** runs the project's lint, typecheck and test commands at the head.
 7. **Report:** writes a ranked report and an index row, records follow-ups where the profile says, and moves the marker to the reviewed head. A failed run leaves the marker alone.

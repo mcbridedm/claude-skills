@@ -17,16 +17,16 @@
 1. **Profile:** loads `.claude/docs-sync.md` and the project's agent instructions; without a profile, discovers the docs and offers a starter.
 2. **Scope:** resolves the range; asks when there's no marker; recommends committing code first.
 3. **Map:** classifies the changes (API, schema, settings, infra, alarms, legal-relevant data, ...), matches each group's triggers, and greps the docs for claims about the changed areas: renamed paths, removed settings, changed numbers, grown lists.
-4. **Audit:** one read-only agent per triggered group, in parallel. Each reports file:line, the wrong text, the evidence, and the corrected text. External systems are checked read-only by the lead.
+4. **Audit:** one read-only agent per triggered group, in parallel: the plugin's `docs:reviewer` agent, Read, Grep and Glob only, no shell, editing or web, so read-only is enforced by its tool list. It reads a diff the lead saved. Each reports file:line, the wrong text, the evidence, and the corrected text. External systems are checked read-only by the lead.
 5. **Validate:** the lead checks every finding against the code, counts (never personal data) and quick checks, and marks it confirmed, partly true, not real or unverified. Only confirmed and partly true findings are fixed.
-6. **Fix:** by the lead, or one fixer agent per group, never two on the same file. Ledgers get dated notes, generated files are regenerated, protected paths wait for your OK.
+6. **Fix:** always by the lead. On large runs, read-only fix drafters (one per group, never two on a file) may return exact replacements first; the lead checks and applies them. Ledgers get dated notes, generated files are regenerated, protected paths wait for your OK.
 7. **Verify:** runs the project's checks; separates its own failures from pre-existing ones.
 8. **Size watch and profile upkeep:** flags docs that are too big or growing fast, with a suggestion to archive or split; proposes profile additions for docs no group covers.
 9. **Report:** files changed per group, findings by verdict, what needs you, the new marker, the commit.
 
 ## Cost and when to run it
 
-- **Cost:** 3 to 6 read-only auditors (fewer for a small range), plus fixers only on large runs; 10 to 30 minutes on a busy monorepo. A full `all` audit costs more. It isn't cheap enough to run on every commit, which is why Claude doesn't start it on its own.
+- **Cost:** 3 to 6 read-only auditors (fewer for a small range), plus fix drafters only on large runs; 10 to 30 minutes on a busy monorepo. A full `all` audit costs more. It isn't cheap enough to run on every commit, which is why Claude doesn't start it on its own.
 - **Run it:**
   - after a working session, especially one with several agents, in a new session (the one that did the work shouldn't check its own docs);
   - before restarting or handing over to a new session, so it starts from true docs;

@@ -119,9 +119,9 @@ Mark anything you inferred rather than read as an inference.
 
 Build the roster: start from `reference/personas.md` (13 personas, in order), then apply the profile's "Panel" section: drop, rename or add personas, and for each persona replace or extend the lens as the profile says. Number the final roster in order.
 
-Send one Agent call per persona **in a single message** so they run concurrently. Use `subagent_type: "Plan"`: it can read, search and research, but has no file-editing tools. Its shell can still write, so the brief forbids it and Step 3 checks. (If the Plan agent isn't available, use the most read-only agent type there is, and rely on the brief and Step 3.)
+Send one Agent call per persona **in a single message** so they run concurrently. Use `subagent_type: "architecture:reviewer"`, this plugin's reviewer agent: its only tools are Read, Grep, Glob, WebFetch and WebSearch, so it can read, search and research but has no shell and can't edit, write or run anything. Read-only is enforced by its tool list, not just asked for. Everything that needs a command (the shared checks, git history) you run in Step 1 and hand over in the context document. (If that agent isn't available, e.g. the skill was copied without its plugin, use the most read-only agent type there is, such as `Plan`, and rely on the brief and Step 3's check.)
 
-Each reviewer gets the same brief with its own persona filled in. Reviewers don't share your conversation; they **read the context document from disk**, by its absolute path, so a correction to it reaches everyone and each brief stays short. The brief is a template: replace the `<...>` placeholders with the profile's values, and drop a bracketed line whose condition doesn't hold.
+Each reviewer gets the same brief with its own persona filled in. Reviewers don't share your conversation; they **read the context document from disk**, by its absolute path, so a correction to it reaches everyone and each brief stays short. They return their reports in their reply; you write every file. The brief is a template: replace the `<...>` placeholders with the profile's values, and drop a bracketed line whose condition doesn't hold.
 
 ```
 You are the <PERSONA> on an architecture review panel for <PROJECT>, <PRODUCT ONE-LINER>.
@@ -132,9 +132,10 @@ Your lens: <LENS>
 
 Start by reading the architectural context document at <absolute path to RUN_DIR/context.md>,
 in full. Treat it as your starting point, then verify in the code: read the files behind any
-claim you rely on, and cite file paths (with line numbers where useful). Do not create, edit
-or delete any file, and run read-only commands only (no installs, builds, tests or git
-commands that change state).
+claim you rely on, and cite file paths (with line numbers where useful). You have no shell
+and no editing tools: read and search instead of running commands, and return your report in
+your reply rather than saving it. If a claim can only be settled by running something, name
+the command under Sources and the CTO will run it.
 
 <CALIBRATION: the profile's calibration text for its stage. Default for pre-launch:
 "<PROJECT> is pre-launch: nothing is deployed and there is no traffic. Judge it as of today.
@@ -209,7 +210,7 @@ If a reviewer fails or returns something off-format, re-run that one persona onc
 
 Save every report verbatim, in roster order, to `<RUN_DIR>/panel.md`, under a short header giving the date, the commit reviewed (`git rev-parse --short HEAD`), the focus if any, the roster (if it differs from the default), and any persona that failed. Don't edit them; the user should be able to see what each reviewer actually said.
 
-Then check that the panel changed nothing: compare `git status --porcelain` with what Step 0 noted. If a reviewer created or changed a file, revert only that (`git checkout -- <file>`, or delete a new untracked file), never anything that was there before the run, and say so in the header.
+Then check that the panel changed nothing: compare `git status --porcelain` with what Step 0 noted. The reviewer agent can't write, so this is a backstop for the fallback agent type. If a reviewer created or changed a file, revert only that (`git checkout -- <file>`, or delete a new untracked file), never anything that was there before the run, and say so in the header.
 
 ## Step 4: CTO synthesis
 

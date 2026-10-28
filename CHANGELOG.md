@@ -2,6 +2,46 @@
 
 All notable changes to this repository are recorded here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versions are per plugin, as set in each `plugin.json`, and follow [Semantic Versioning](https://semver.org/).
 
+## architecture 0.6.0 - 2026-10-28
+
+### Added
+
+- `agents/reviewer.md` (`architecture:reviewer`): a read-only reviewer agent. Tools: Read, Grep, Glob, WebFetch, WebSearch; no shell, no editing tools.
+
+### Changed
+
+- `architecture-review`, `design-review`: reviewers are dispatched as `architecture:reviewer` instead of `Plan`, so read-only is enforced by the agent's tool list, not only by the brief. The briefs say reviewers have no shell, read instead of running commands, return their report in the reply, and name any command the lead should run. The `git status` check stays as a backstop for the fallback agent type.
+- `user-panel-review`: unchanged; its panelists stay general-purpose agents, since they need a shell and a browser to use the product.
+
+## code-quality 0.5.0 - 2026-10-28
+
+### Added
+
+- `agents/reviewer.md` (`code-quality:reviewer`): a read-only reviewer agent. Tools: Read, Grep, Glob; no shell, no editing, no web.
+
+### Changed
+
+- `commit-range-review`: slice and cross-cutting reviewers are dispatched as `code-quality:reviewer`. The lead now saves each slice's `git diff` and each merge's `git show --remerge-diff` inside the git directory (never tracked or committed, deleted at the end), and gives reviewers a checkout at the head (a temporary worktree if the working tree isn't there). Reviewers no longer run tests: they say what to run, and the lead runs it when verifying.
+- `codebase-audit`: auditors are dispatched as `code-quality:reviewer` and read the checkout at the pinned commit (the repository or the temporary worktree) instead of `git show`. Tests and commands are the lead's, in verification.
+- `outside-contribution-review`: unchanged; it uses no sub-agents.
+
+## docs 0.3.0 - 2026-10-28
+
+### Added
+
+- `agents/reviewer.md` (`docs:reviewer`): a read-only reviewer agent. Tools: Read, Grep, Glob; no shell, no editing, no web.
+
+### Changed
+
+- `docs-sync`: auditors are dispatched as `docs:reviewer` and read a per-group diff the lead saves inside the git directory (deleted at the end). Fixer agents are replaced by read-only **fix drafters** (large runs only) that return exact old/new text; the lead checks and applies every edit. External groups are checked by the lead only.
+
+## Repository - 2026-10-28 (agents)
+
+### Changed
+
+- README "Layout" and CONTRIBUTING section 2: plugins may ship `agents/`; review sub-agents use the plugin's own read-only agent; Bash only when unavoidable, and said so.
+- `scripts/validate.mjs`: checks each plugin's `agents/*.md` for front matter with `name` (matching the file name), `description` and `tools`, and that an agent granting Bash says so in its description.
+
 ## setup 0.2.1 - 2026-10-28
 
 ### Changed
