@@ -42,6 +42,12 @@ All notable changes to this repository are recorded here. The format follows [Ke
 - README "Layout" and CONTRIBUTING section 2: plugins may ship `agents/`; review sub-agents use the plugin's own read-only agent; Bash only when unavoidable, and said so.
 - `scripts/validate.mjs`: checks each plugin's `agents/*.md` for front matter with `name` (matching the file name), `description` and `tools`, and that an agent granting Bash says so in its description.
 
+## setup 0.3.1 - 2026-10-28
+
+### Changed
+
+- `project-setup`: housekeeping checks the per-turn load (skill descriptions, MCP tool names, a long agent-instructions file) and suggests setting aside what the project doesn't use.
+
 ## setup 0.3.0 - 2026-10-28
 
 ### Added

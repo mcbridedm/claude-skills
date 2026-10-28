@@ -58,6 +58,7 @@ Read `reference/guardrails.md` and follow it:
 ## Step 5: Housekeeping
 
 Offer each, show it, write it only if the user agrees:
+- **Per-turn load:** every skill description and every MCP tool name loads on every turn of every session (and every sub-agent's start). List user and project skills, plugins and MCP servers (`claude plugin list`, `claude mcp list`, `~/.claude/skills`), and suggest setting aside what this project doesn't use: skills moved to a disabled folder (reversible), MCP servers that never connect removed, connectors turned off for this project in `/mcp` (the user does that one). Also flag an agent-instructions file over about 2,500 tokens as a candidate for path-scoped rules.
 - `.claude/worktrees/` in `.gitignore`, if agents may work in parallel worktrees.
 - A project-scope marketplace registration, so teammates are offered the plugins: give the command (`claude plugin marketplace add <owner>/<repo> --scope project`) for the user to run; it writes `.claude/settings.json`.
 
