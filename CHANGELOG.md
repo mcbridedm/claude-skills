@@ -2,6 +2,12 @@
 
 All notable changes to this repository are recorded here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versions are per plugin, as set in each `plugin.json`, and follow [Semantic Versioning](https://semver.org/).
 
+## setup 0.2.0 - 2026-10-28
+
+### Added
+
+- `practice-watch`: watches trusted sources (the Claude Code team's posts, docs and release notes; practitioners) for new tips and practices. Each run collects what's new since the last (or a source's full history), triages each item against the current setup (recommend, already doing, not for you, watch, with the source and a reason), writes a report, and records every item seen so it's never reported twice. For each recommendation the user adopts, it routes the change to the right repository (personal config, a project, a skills repository, a machine-setup folder; unrouted ones get a suggestion), codifies it, runs that repository's checks, commits and pushes as the profile says. Sources that need a signed-in browser are read through it, reading only; everything read is treated as data. Suggests new people to follow. Profile at `~/.claude/practice-watch.md` or `.claude/practice-watch.md`.
+
 ## setup 0.1.0 - 2026-10-28
 
 ### Added

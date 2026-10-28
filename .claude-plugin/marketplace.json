@@ -33,7 +33,7 @@
     {
       "name": "setup",
       "source": "./plugins/setup",
-      "description": "Setup skills: sets up a project to use these skills, with starter profiles from each skill's own format, a section in CLAUDE.md or AGENTS.md, and optional guardrails for parallel fix runs (permission ask rules and a hook that refuses shell writes to protected paths).",
+      "description": "Setup skills: sets up a project to use these skills (starter profiles, a section in CLAUDE.md or AGENTS.md, optional guardrails with a hook that refuses shell writes to protected paths), and keeps a Claude Code setup current by watching trusted sources for new practices, recommending them and codifying the ones adopted.",
       "category": "development"
     }
   ]
