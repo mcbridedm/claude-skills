@@ -14,6 +14,7 @@ Every profile is optional: a skill without one discovers defaults and offers a s
 | `infrastructure` | `cloud-first-apply` | `.claude/cloud-first-apply.md` | The IaC roots, the default root, regions, vendors and accounts, where the guide goes | One guide per root |
 | `setup` | `project-setup` | none | | |
 | `setup` | `practice-watch` | `~/.claude/practice-watch.md` (or `.claude/practice-watch.md`) | The sources to watch, where the record and reports live, your setup files, where adopted practices go and how they're pushed, your "not for me" list | A record of every item seen and a report per run, in the repository the profile names |
+| `setup` | `headless-job` | none (the jobs folder holds each job's files) | | Logs in `~/Library/Logs/claude-jobs/` or `~/.local/state/claude-jobs/` |
 
 ## When each one is started
 

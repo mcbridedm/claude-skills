@@ -1,0 +1,6 @@
+# One tool rule per line, passed to --allowedTools. Everything else is refused.
+Read
+Grep
+Glob
+Bash(gh pr list:*)
+Bash(gh pr view:*)

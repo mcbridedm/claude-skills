@@ -1,0 +1,19 @@
+#!/bin/sh
+# Installs (or reinstalls) this folder's schedules for the current user: launchd on macOS, systemd
+# user timers on Linux. Safe to run again. The person runs it: it adds schedules that outlive the session.
+set -eu
+JOBS=$(cd "$(dirname "$0")/.." && pwd)
+if [ "$(uname)" = Darwin ]; then
+  mkdir -p "$HOME/Library/LaunchAgents" "$HOME/Library/Logs/claude-jobs"
+  for p in "$JOBS"/launchd/*.plist; do
+    label=$(basename "$p" .plist); dst="$HOME/Library/LaunchAgents/$label.plist"
+    launchctl bootout "gui/$(id -u)/$label" 2>/dev/null || true
+    sed -e "s#JOBS_DIR#$JOBS#g" -e "s#HOME_DIR#$HOME#g" "$p" >"$dst"
+    launchctl bootstrap "gui/$(id -u)" "$dst"; echo "installed $label"
+  done
+else
+  dst="${XDG_CONFIG_HOME:-$HOME/.config}/systemd/user"; mkdir -p "$dst"
+  for u in "$JOBS"/systemd/*; do sed -e "s#JOBS_DIR#$JOBS#g" "$u" >"$dst/$(basename "$u")"; done
+  systemctl --user daemon-reload
+  for t in "$JOBS"/systemd/*.timer; do systemctl --user enable --now "$(basename "$t")"; echo "installed $(basename "$t")"; done
+fi

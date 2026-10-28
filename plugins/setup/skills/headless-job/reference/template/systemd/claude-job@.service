@@ -1,0 +1,6 @@
+[Unit]
+Description=Claude Code headless job %i
+
+[Service]
+Type=oneshot
+ExecStart=JOBS_DIR/bin/run %i

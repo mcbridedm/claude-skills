@@ -42,6 +42,12 @@ All notable changes to this repository are recorded here. The format follows [Ke
 - README "Layout" and CONTRIBUTING section 2: plugins may ship `agents/`; review sub-agents use the plugin's own read-only agent; Bash only when unavoidable, and said so.
 - `scripts/validate.mjs`: checks each plugin's `agents/*.md` for front matter with `name` (matching the file name), `description` and `tools`, and that an agent granting Bash says so in its description.
 
+## setup 0.3.0 - 2026-10-28
+
+### Added
+
+- `headless-job`: turns a recurring task into a headless job that runs outside any Claude Code session. It first judges whether the task can run headless (what it needs; narrow authorization; a cheap guard; what needs a person) and says why not when it can't. Then it writes the job from a template: `prompt.md`, a `tools` list passed as `--allowedTools` with everything else refused, a shell `guard` so Claude starts only when there's work, a `model` and a USD cap per run, and a launchd (macOS) or systemd (Linux) schedule. The person runs the install. The runner logs every run and raises a desktop notification for reply lines starting `OWNER:`.
+
 ## setup 0.2.1 - 2026-10-28
 
 ### Changed
