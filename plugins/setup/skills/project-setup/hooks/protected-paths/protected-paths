@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+# Runs protected-paths.mjs (the hook that blocks shell writes under the paths in
+# .claude/protected-paths.json) with whatever Node there is: the hook's shell may not have it on
+# PATH. Without Node it still blocks, roughly, any command that names a protected path and looks
+# like a write, so a machine without Node isn't a way around it.
+set -uo pipefail
+here="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+input="$(cat)"
+
+node_bin="$(command -v node || true)"
+if [[ -z "$node_bin" ]]; then
+  for candidate in "$HOME"/.nvm/versions/node/*/bin/node /opt/homebrew/bin/node /usr/local/bin/node; do
+    [[ -x "$candidate" ]] && node_bin="$candidate"
+  done
+fi
+
+if [[ -n "$node_bin" ]]; then
+  printf '%s' "$input" | "$node_bin" "$here/protected-paths.mjs"
+  exit $?
+fi
+
+config="${CLAUDE_PROJECT_DIR:-.}/.claude/protected-paths.json"
+[[ -f "$config" ]] || exit 0
+# The quoted names inside "paths": [...], escaped for grep -E.
+names="$(tr -d '\n' < "$config" | sed -n 's/.*"paths"[[:space:]]*:[[:space:]]*\[\([^]]*\)\].*/\1/p' | grep -o '"[^"]*"' | tr -d '"' | sed 's/[.[\*^$()+?{}|]/\\&/g' | paste -sd'|' -)"
+[[ -n "$names" ]] || exit 0
+if grep -Eq "(^|[^[:alnum:]_.-])($names)/" <<< "$input" && grep -Eq "(>|sed |perl |tee |python|cp |mv |rm )" <<< "$input"; then
+  echo "Blocked by the protected-paths hook (no Node found, so judged roughly): this command names a protected path and may write there. Use the Edit and Write tools." >&2
+  exit 2
+fi
+exit 0

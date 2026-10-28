@@ -1,0 +1,7 @@
+{
+  "paths": ["deploy", ".github"],
+  "rewriters": [
+    { "pattern": "\\b(tofu|terraform)\\s+fmt\\b", "unless": "-check\\b", "why": "tofu fmt rewrites files in place (use tofu fmt -check)" }
+  ],
+  "message": "See CONTRIBUTING.md, \"Protected paths\"."
+}

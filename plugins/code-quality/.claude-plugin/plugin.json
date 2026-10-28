@@ -1,0 +1,25 @@
+{
+  "name": "code-quality",
+  "displayName": "Code quality",
+  "version": "0.4.1",
+  "description": "Code quality skills: a parallel, verified review of a range of commits already on a branch, resuming where the last review stopped; a whole-codebase audit of one commit against its own designs, decisions, rules and docs, with proven coverage; and a safe, standards-based review of pull requests from outside contributors, people or AI agents, with a written verdict.",
+  "author": {
+    "name": "Devin McBride"
+  },
+  "repository": "https://github.com/mcbridedm/claude-skills",
+  "license": "MIT",
+  "keywords": [
+    "code-review",
+    "commits",
+    "trunk-based",
+    "multi-agent",
+    "verification",
+    "pull-requests",
+    "open-source",
+    "contributions",
+    "prompt-injection",
+    "audit",
+    "conformance",
+    "documentation"
+  ]
+}

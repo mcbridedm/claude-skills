@@ -1,0 +1,40 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "mcbridedm-skills",
+  "description": "Reusable Claude Code skills for software engineering, grouped into one plugin per kind.",
+  "owner": {
+    "name": "Devin McBride"
+  },
+  "plugins": [
+    {
+      "name": "architecture",
+      "source": "./plugins/architecture",
+      "description": "Architecture skills: a multi-agent architecture review from the inside, an outside-in user panel review, and a lightweight design review of one design before it's built, each adapting to any repository through a per-project profile.",
+      "category": "development"
+    },
+    {
+      "name": "code-quality",
+      "source": "./plugins/code-quality",
+      "description": "Code quality skills: a parallel, verified review of a range of commits already on a branch, resuming where the last review stopped; a whole-codebase audit of one commit against its own designs, decisions, rules and docs, with proven coverage; and a safe, standards-based review of pull requests from outside contributors, people or AI agents, with a written verdict.",
+      "category": "development"
+    },
+    {
+      "name": "infrastructure",
+      "source": "./plugins/infrastructure",
+      "description": "Infrastructure skills: a step-by-step first-apply guide for any infrastructure-as-code root, with region callouts, cross-environment checks, DNS and secret steps, and a scale-to-zero ('park') drill, if the project has one.",
+      "category": "development"
+    },
+    {
+      "name": "docs",
+      "source": "./plugins/docs",
+      "description": "Documentation skills: a profile-driven docs sync that brings a project's docs, ledgers, generated files and project state back in line with the code, with parallel read-only audits, every finding validated before it's fixed, and a marker so the next sync resumes.",
+      "category": "development"
+    },
+    {
+      "name": "setup",
+      "source": "./plugins/setup",
+      "description": "Setup skills: sets up a project to use these skills, with starter profiles from each skill's own format, a section in CLAUDE.md or AGENTS.md, and optional guardrails for parallel fix runs (permission ask rules and a hook that refuses shell writes to protected paths).",
+      "category": "development"
+    }
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "name": "infrastructure",
+  "displayName": "Infrastructure",
+  "version": "0.2.1",
+  "description": "Infrastructure skills: a step-by-step first-apply guide for any infrastructure-as-code root, with region callouts, cross-environment checks, DNS and secret steps, and a scale-to-zero ('park') drill, if the project has one.",
+  "author": {
+    "name": "Devin McBride"
+  },
+  "repository": "https://github.com/mcbridedm/claude-skills",
+  "license": "MIT",
+  "keywords": ["infrastructure", "iac", "terraform", "opentofu", "deployment", "checklist"]
+}

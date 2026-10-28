@@ -1,0 +1,21 @@
+{
+  "name": "architecture",
+  "displayName": "Architecture",
+  "version": "0.5.0",
+  "description": "Architecture skills: a multi-agent architecture review from the inside, an outside-in user panel review, and a lightweight design review of one design before it's built, each adapting to any repository through a per-project profile.",
+  "author": {
+    "name": "Devin McBride"
+  },
+  "repository": "https://github.com/mcbridedm/claude-skills",
+  "license": "MIT",
+  "keywords": [
+    "architecture",
+    "review",
+    "multi-agent",
+    "cto",
+    "usability",
+    "red-team",
+    "design-review",
+    "adr"
+  ]
+}
