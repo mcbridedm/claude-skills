@@ -53,6 +53,9 @@ The skills are built to be used as a rhythm, not one-offs: cheap checks with eve
 - **Review in a fresh session, not the one that wrote the code.** A conversation that built something tends to approve it. The context check at the start of every skill (below) says when to start a new session.
 - **Hold the target still.** Don't run a deep review while merges, deploys or agents are still changing the code; wait for them.
 - **One expensive review at a time.** Each one reads a lot. Running them together costs more and makes their findings overlap.
+- **Mechanical work on a cheaper model, judgement on yours.** Where a skill has purely mechanical sub-agent work (today: `docs-sync`'s fix placers, which place text the lead already validated), it goes to the plugin's `checker` agent on a cheaper model, and is re-run automatically on the session's model when the checker flags a judgement call, returns the wrong shape or fails a spot check. Reviews, audits, verification and triage never move. A profile's `models: { checker: inherit }` turns it off.
+- **Sub-agents for parallel or independent work only.** Start one per independent unit (an area, a review), with a clear brief: the goal, how to tell it's done, the effort. A lookup that takes a few tool calls is cheaper done directly, and with large context windows "saving context" alone isn't a reason.
+- **Reviews that read files from disk get their own worktree.** `/code-review` on a branch checks that branch out in the current working tree, so parallel reviewers sharing one checkout can read each other's branch. Give each its own worktree, or have it read only through git (`git show <branch>:<path>`).
 - **Track the ids.** Put adopted findings in your roadmap or issue tracker with their ids, so the next review can tell what's fixed.
 
 ## Install
@@ -188,12 +191,14 @@ plugins/<kind>/
   .claude-plugin/plugin.json        the plugin's name, version, description
   README.md                         the kind's skills and agents
   agents/<name>.md                  sub-agents the skills dispatch, e.g. a read-only reviewer
-                                    (front matter: name, description, tools); scoped as <kind>:<name>
+                                    (front matter: name, description, tools); scoped as <kind>:<name>;
+                                    a checker (model: sonnet) for mechanical work, where a skill has it
   skills/<skill-name>/
     SKILL.md                        the skill (short; front matter + steps)
     README.md                       what it does, cost, when to run it, sample output
-    reference/                      detail loaded only when a step needs it
-templates/skill/                    starter files for a new skill
+    reference/                      detail loaded only when a step needs it; shared copies of
+                                    context-check.md and, with a checker, checker-escalation.md
+templates/skill/                    starter files for a new skill, and the shared references' originals
 scripts/validate.mjs                light checks (plain Node, no dependencies)
 .github/workflows/validate.yml      runs the checks on pushes to main and on pull requests
 ```

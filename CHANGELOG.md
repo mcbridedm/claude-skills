@@ -2,6 +2,30 @@
 
 All notable changes to this repository are recorded here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versions are per plugin, as set in each `plugin.json`, and follow [Semantic Versioning](https://semver.org/).
 
+## docs 0.4.0 - 2026-10-28
+
+### Added
+
+- `agents/checker.md` (`docs:checker`): a read-only checker for mechanical sub-agent work, on a cheaper model (`model: sonnet`). Same tools as `docs:reviewer` (Read, Grep, Glob). It does exactly the task, marks anything that needs a judgement call `NEEDS-JUDGEMENT: <why>` instead of guessing, and reports in the exact shape asked.
+- `docs-sync`: `reference/checker-escalation.md`, the shared escalation rule: the lead re-runs a checker's unit with `docs:reviewer` for items marked `NEEDS-JUDGEMENT`, a malformed or incomplete reply, or a failed spot check (at least 3 items); units touching security, money, credentials, personal data or published text use the reviewer from the start; never re-run on the cheaper model; every escalation is reported, and a role escalating in more than about a third of its units is recommended for the stronger model.
+- `docs-sync`: optional profile setting `models: { checker: sonnet }` (the default); an alias changes the checker's model, `inherit` runs everything on the session's model.
+
+### Changed
+
+- `docs-sync`: on large runs, Step 5 splits the fix agents. Files whose fixes all carry exact, validated text go to **fix placers** (`docs:checker`, new fix placer brief), which only copy the current text and pair it with the lead's; files needing new wording go to fix drafters (`docs:reviewer`), as before. The report gains an "Escalations" line. Auditors and validation are unchanged and stay on the session's model.
+
+## Repository - 2026-10-28 (checkers)
+
+### Added
+
+- `templates/skill/reference/checker-escalation.md`: the original of the shared escalation rule, copied unchanged into every skill that uses a checker.
+
+### Changed
+
+- `scripts/validate.mjs`: an agent's `model` must be an accepted value; a `checker` agent must set `model` and have exactly its plugin reviewer's tools; a skill that dispatches a checker must point to `reference/checker-escalation.md`, carry a copy identical to the template, and document `models` in its profile format.
+- CONTRIBUTING section 2 and the README (Layout, rules of thumb): mechanical sub-agent work may run on a cheaper `checker` agent with automatic escalation; judgement work stays on the session's model.
+- Every other skill's sub-agent roles were classified as judgement and left on the session's model: `architecture-review` panelists, `design-review` reviewers, `user-panel-review` panelists, `commit-range-review` slice and cross-cutting reviewers, `codebase-audit` auditors, `docs-sync` auditors and fix drafters. `outside-contribution-review`, `cloud-first-apply` and `practice-watch` use no sub-agents.
+
 ## architecture 0.6.0 - 2026-10-28
 
 ### Added

@@ -1,6 +1,6 @@
-# Auditor and fix drafter briefs: docs-sync
+# Auditor, fix drafter and fix placer briefs: docs-sync
 
-Fill in the `<...>` placeholders. Drop a bracketed line whose condition doesn't hold. Auditors don't share your conversation: everything they need is in the brief or in a file it points to. Both briefs go to the `docs:reviewer` agent, which can only read and search: no shell, no editing. Every file is written by the lead.
+Fill in the `<...>` placeholders. Drop a bracketed line whose condition doesn't hold. Agents don't share your conversation: everything they need is in the brief or in a file it points to. The auditor and fix drafter briefs go to the `docs:reviewer` agent; the fix placer brief goes to the `docs:checker` agent, on a cheaper model (see `checker-escalation.md`). Both agents can only read and search: no shell, no editing. Every file is written by the lead.
 
 ## Auditor brief (Step 3)
 
@@ -62,7 +62,7 @@ One block per finding, worst first:
 <what you couldn't check and why, or "none">
 ```
 
-## Fix drafter brief (Step 5, large runs only)
+## Fix drafter brief (Step 5, large runs only, and for escalated fix placer units)
 
 ```
 You are drafting validated documentation fixes in <PROJECT>, at <absolute repo path>. You
@@ -88,6 +88,42 @@ Reply with, per file:
   old: <the exact current text, copied from the file, long enough to occur only once>
   new: <the replacement text>
 Then: anything you couldn't draft and why; anything else you noticed.
+```
+
+## Fix placer brief (Step 5, large runs only; mechanical)
+
+Only for files whose every fix has exact corrected text the lead already validated. Anything that needs new wording goes to a fix drafter instead.
+
+```
+You are placing validated documentation fixes in <PROJECT>, at <absolute repo path>. This is a
+mechanical task: every replacement text below is final. You find where each one goes and
+return exact old/new pairs; you don't edit anything, and the lead applies them.
+
+Your files: <list>. Work on these only.
+
+Fixes, each with its final text:
+<- fix <id>, path:line: the text to replace (quoted, short) -> the exact new text>
+<"Last verified" or "last updated" lines to set, where the file has them: <today>, <head short>>
+
+For each fix:
+- read the file and find the text to replace near the line given;
+- copy the current text exactly, character for character, long enough to occur only once in
+  the file;
+- build the new text from the copied text with only the fix's change made, so any text
+  around it that you copied for uniqueness carries over unchanged.
+If a fix can't be placed without a choice the brief doesn't make (the text isn't there, it
+occurs more than once and no longer copy makes it unique, the new text doesn't fit the
+sentence it lands in, or it would need wording of your own), don't choose: write
+"NEEDS-JUDGEMENT: <why>" for that fix and go on. Don't fix anything else you notice: list
+it at the end.
+
+Reply with, per file, every fix you were given, in this exact shape:
+### <path>
+- fix <id>:
+  old: <the exact current text>
+  new: <the replacement text>
+- fix <id>: NEEDS-JUDGEMENT: <why>
+Then: "Noticed:" and anything else you saw, or "none".
 ```
 
 ## Finding ids

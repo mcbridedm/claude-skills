@@ -19,14 +19,14 @@
 3. **Map:** classifies the changes (API, schema, settings, infra, alarms, legal-relevant data, ...), matches each group's triggers, and greps the docs for claims about the changed areas: renamed paths, removed settings, changed numbers, grown lists.
 4. **Audit:** one read-only agent per triggered group, in parallel: the plugin's `docs:reviewer` agent, Read, Grep and Glob only, no shell, editing or web, so read-only is enforced by its tool list. It reads a diff the lead saved. Each reports file:line, the wrong text, the evidence, and the corrected text. External systems are checked read-only by the lead.
 5. **Validate:** the lead checks every finding against the code, counts (never personal data) and quick checks, and marks it confirmed, partly true, not real or unverified. Only confirmed and partly true findings are fixed.
-6. **Fix:** always by the lead. On large runs, read-only fix drafters (one per group, never two on a file) may return exact replacements first; the lead checks and applies them. Ledgers get dated notes, generated files are regenerated, protected paths wait for your OK.
+6. **Fix:** always by the lead. On large runs, read-only agents (never two on a file) may return exact replacements first; the lead checks and applies them. Fixes whose exact text is already validated go to **fix placers**, mechanical work on the cheaper `docs:checker` agent; fixes that need new wording go to **fix drafters** on `docs:reviewer`. A placer's unit is re-run with the reviewer automatically when it flags `NEEDS-JUDGEMENT`, returns the wrong shape, or fails the lead's spot check; published, legal or security-related docs skip the checker ([reference/checker-escalation.md](reference/checker-escalation.md)). Ledgers get dated notes, generated files are regenerated, protected paths wait for your OK.
 7. **Verify:** runs the project's checks; separates its own failures from pre-existing ones.
 8. **Size watch and profile upkeep:** flags docs that are too big or growing fast, with a suggestion to archive or split; proposes profile additions for docs no group covers.
-9. **Report:** files changed per group, findings by verdict, what needs you, the new marker, the commit.
+9. **Report:** files changed per group, findings by verdict, what needs you, any escalations from the checker, the new marker, the commit.
 
 ## Cost and when to run it
 
-- **Cost:** 3 to 6 read-only auditors (fewer for a small range), plus fix drafters only on large runs; 10 to 30 minutes on a busy monorepo. A full `all` audit costs more. It isn't cheap enough to run on every commit, which is why Claude doesn't start it on its own.
+- **Cost:** 3 to 6 read-only auditors (fewer for a small range), plus fix drafters and placers only on large runs (placers on a cheaper model, `models: { checker: sonnet }` by default; `inherit` runs them on the session model); 10 to 30 minutes on a busy monorepo. A full `all` audit costs more. It isn't cheap enough to run on every commit, which is why Claude doesn't start it on its own.
 - **Run it:**
   - after a working session, especially one with several agents, in a new session (the one that did the work shouldn't check its own docs);
   - before restarting or handing over to a new session, so it starts from true docs;

@@ -52,6 +52,12 @@ const changelog = existsSync(join(root, "CHANGELOG.md")) ? readFileSync(join(roo
 const contextCheckPath = join(root, "templates", "skill", "reference", "context-check.md");
 const contextCheck = existsSync(contextCheckPath) ? readFileSync(contextCheckPath, "utf8") : null;
 if (!contextCheck) fail("templates/skill/reference/context-check.md: missing");
+const escalationPath = join(root, "templates", "skill", "reference", "checker-escalation.md");
+const escalation = existsSync(escalationPath) ? readFileSync(escalationPath, "utf8") : null;
+if (!escalation) fail("templates/skill/reference/checker-escalation.md: missing");
+// Accepted values for an agent's `model` (https://code.claude.com/docs/en/sub-agents).
+const agentModel = (m) => ["sonnet", "opus", "haiku", "fable", "inherit"].includes(m) || /^claude-[a-z0-9.-]+$/.test(m);
+const toolSet = (t) => (t ?? "").split(",").map((x) => x.trim()).filter(Boolean).sort().join(",");
 if (!readme) fail("README.md: missing");
 if (!changelog) fail("CHANGELOG.md: missing");
 
@@ -86,6 +92,7 @@ if (market) {
     // read-only by a tool list, so an agent granted Bash must say so in its description.
     const adir = join(pdir, "agents");
     const agentFiles = existsSync(adir) ? readdirSync(adir).filter((f) => f.endsWith(".md")) : [];
+    const hasChecker = agentFiles.includes("checker.md");
     for (const file of agentFiles) {
       const apath = join(adir, file);
       const afm = frontMatter(apath);
@@ -98,6 +105,18 @@ if (market) {
       if (afm.name && !/^[a-z0-9]+(-[a-z0-9]+)*$/.test(afm.name)) fail(`${rel(apath)}: name must be kebab-case`);
       if (afm.tools && /\bBash\b/.test(afm.tools) && !/\bBash\b/.test(afm.description ?? ""))
         fail(`${rel(apath)}: grants Bash; say so in its description`);
+      if (afm.model && !agentModel(afm.model))
+        fail(`${rel(apath)}: model "${afm.model}" isn't sonnet, opus, haiku, fable, inherit or a full model id`);
+      // A checker does the plugin's mechanical work on a cheaper model (CONTRIBUTING, section 2):
+      // it names its model, and has exactly the reviewer's read-only tools.
+      if (file === "checker.md") {
+        if (!afm.model) fail(`${rel(apath)}: a checker sets model (e.g. sonnet)`);
+        const reviewer = join(adir, "reviewer.md");
+        const rfm = existsSync(reviewer) ? frontMatter(reviewer) : null;
+        if (!rfm) fail(`${rel(apath)}: a checker needs the plugin's agents/reviewer.md to escalate to`);
+        else if (toolSet(afm.tools) !== toolSet(rfm.tools))
+          fail(`${rel(apath)}: tools differ from agents/reviewer.md (a checker has the reviewer's tools)`);
+      }
     }
     const skills = dirs(join(pdir, "skills"));
     if (skills.length === 0) warnings.push(`${rel(pdir)}: no skills/ folders`);
@@ -137,6 +156,21 @@ if (market) {
       if (!existsSync(check)) fail(`${rel(check)}: missing (copy templates/skill/reference/context-check.md)`);
       else if (contextCheck && readFileSync(check, "utf8") !== contextCheck)
         fail(`${rel(check)}: differs from templates/skill/reference/context-check.md (change the template, then copy it to every skill)`);
+      // A skill that sends work to a checker carries the shared escalation rule unchanged, and
+      // offers the models setting in its profile format.
+      const esc = join(sdir, "reference", "checker-escalation.md");
+      const usesChecker = /:checker\b/.test(body);
+      if (usesChecker) {
+        if (!hasChecker) fail(`${rel(skillMd)}: dispatches a checker, but ${rel(adir)}/checker.md is missing`);
+        if (!body.includes("reference/checker-escalation.md"))
+          fail(`${rel(skillMd)}: dispatches a checker without pointing to reference/checker-escalation.md`);
+        if (!existsSync(esc)) fail(`${rel(esc)}: missing (copy templates/skill/reference/checker-escalation.md)`);
+        const pf = join(sdir, "reference", "profile-format.md");
+        if (!existsSync(pf) || !/models\.checker|models:/.test(readFileSync(pf, "utf8")))
+          fail(`${rel(pf)}: a skill with a checker documents the models setting`);
+      } else if (existsSync(esc)) warnings.push(`${rel(esc)}: present, but SKILL.md dispatches no checker`);
+      if (existsSync(esc) && escalation && readFileSync(esc, "utf8") !== escalation)
+        fail(`${rel(esc)}: differs from templates/skill/reference/checker-escalation.md (change the template, then copy it to every skill that has it)`);
     }
   }
   for (const d of dirs(join(root, "plugins")))

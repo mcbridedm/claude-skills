@@ -20,6 +20,8 @@ checks:                         # run after the edits (Step 6); default: discove
 commit: true                    # commit the edited docs and the marker in one commit
 push: false
 commit_message: "Docs sync: <range>"
+models:                         # optional: the model for mechanical sub-agent work (Step 5)
+  checker: sonnet               # an alias (sonnet, haiku, opus, fable), or inherit to run everything on the session model
 ---
 ```
 
@@ -35,6 +37,7 @@ commit_message: "Docs sync: <range>"
 | `commit` | true with a profile; without one, only if the user says so |
 | `push` | false |
 | `commit_message` | `Docs sync: <base short>..<head short>` |
+| `models.checker` | `sonnet`, the `docs:checker` agent's own model. Only fix placers use it; auditors and fix drafters always run on the session's model. `inherit` sends fix placer work to `docs:reviewer` instead. Escalation to the reviewer is automatic either way; see [checker-escalation.md](checker-escalation.md). |
 
 ## Sections
 
@@ -82,7 +85,7 @@ Maps paths to change kinds, so triggers can name kinds instead of paths. Default
 
 ### `## Rules` (optional)
 
-The project's rules about docs, or paths to where they are (e.g. "CLAUDE.md, 'Keeping state accurate'"). Auditors and fix drafters get them.
+The project's rules about docs, or paths to where they are (e.g. "CLAUDE.md, 'Keeping state accurate'"). Auditors, fix drafters and fix placers get them.
 
 ### `## Archiving` (optional)
 

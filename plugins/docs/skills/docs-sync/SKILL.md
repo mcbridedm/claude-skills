@@ -13,7 +13,8 @@ You are the project's documentation lead after a working session. Code and proje
 - **Validate before you edit.** Auditors can be confidently wrong. Nothing changes until you've checked it yourself (Step 4).
 - **Change only documents.** Code bugs found on the way are reported, never fixed here. Settings files count as documents only for their comments.
 - **Respect each group's kind:** ledgers get dated notes or new entries, never rewrites; generated files are regenerated, never hand-edited; external systems are checked, never changed.
-- **Agents read; only you write.** Auditors and fix drafters are read-only by their tool list and return text; you make every edit, and never assign one file to two drafters.
+- **Agents read; only you write.** Auditors, fix drafters and fix placers are read-only by their tool list and return text; you make every edit, and never assign one file to two agents.
+- **Mechanical work runs on a cheaper model, judgement never does.** Only fix placers (Step 5) go to the `docs:checker` agent, with automatic escalation to `docs:reviewer` (`reference/checker-escalation.md`). Auditing, validating and drafting new text stay on the session's model.
 - **Ask before editing paths the project's rules protect** (the profile's `ask_before`, or the project's own instructions).
 - **Commit and push only as the profile says.** Default: commit, never push.
 
@@ -22,7 +23,8 @@ Project specifics come from the project's profile at `.claude/docs-sync.md` (Ste
 Supporting files; read them when a step points to them:
 - `${CLAUDE_SKILL_DIR}/reference/profile-format.md`: the profile's settings, group kinds, change kinds and defaults.
 - `${CLAUDE_SKILL_DIR}/reference/example-profile.md`: a filled-in example, also the starting point for a starter profile.
-- `${CLAUDE_SKILL_DIR}/reference/auditor-brief.md`: the briefs for auditors and fix drafters, and the finding format.
+- `${CLAUDE_SKILL_DIR}/reference/auditor-brief.md`: the briefs for auditors, fix drafters and fix placers, and the finding format.
+- `${CLAUDE_SKILL_DIR}/reference/checker-escalation.md`: which work goes to the cheaper `checker` agent, when to re-run it with the reviewer, and how to record it (Step 5).
 
 ## Step C: Context check (first, before anything costly)
 
@@ -102,14 +104,18 @@ If the argument was `audit-only`, skip to Step 8 now: report, no edits, no marke
 
 ## Step 5: Fix
 
-1. **Plan the edits.** You make every edit yourself; no agent writes. Most findings already carry the corrected text, ready to paste. For a large run (more than about 15 files to edit, many with only the intent given), you may first send one fix drafter per group (`docs:reviewer`, the fix drafter brief in `reference/auditor-brief.md`) to return exact replacements, then apply them. A file named by two groups goes to the first group that lists it. **Never two drafters on the same file.**
+1. **Plan the edits.** You make every edit yourself; no agent writes. Most findings already carry the corrected text, ready to paste. For a large run (more than about 15 files to edit), you may first send agents per group to return exact replacements, then apply them. Split each group's files by what their fixes carry:
+   - **Fix placers** (mechanical): files whose every fix has exact corrected text you already validated. The placer only finds and copies the exact current text and pairs it with yours. Use `subagent_type: "docs:checker"` (a cheaper model; the profile's `models` setting can change or turn it off) and the fix placer brief in `reference/auditor-brief.md`, and follow `reference/checker-escalation.md`. Under its rule for units that never go to a checker, files whose text will be published (public docs, API references, legal drafts) or that touch security, money, credentials or personal data go to a fix drafter instead.
+   - **Fix drafters** (judgement): files where any fix gives only the intent, so new text has to be written. Use `docs:reviewer` and the fix drafter brief.
+
+   A file named by two groups goes to the first group that lists it. A file with both kinds of fix goes to the drafter, with all its fixes. **Never two agents on the same file.**
 2. **Ask first where the rules say so.** Collect the edits that touch `ask_before` paths (or paths the project's instructions protect) into one question to the user: each edit in a line, with your recommendation to apply it and why. Apply only what they approve. Don't route around the protection with shell edits.
 3. **Apply by kind:**
    - **docs:** the corrected text, in the project's writing style and the file's own format. Keep "last verified" or "last updated" lines current where the file has them.
    - **ledger:** a dated note (`YYYY-MM-DD: ...`) under the entry, a new entry in the ledger's format, or an index row. A new decision that needs a new record (an ADR) is proposed to the maintainer, not written, unless the project's rules say the docs sync writes them.
    - **generated:** run the group's `regenerate` command; never hand-edit. If it needs network or credentials and fails, report it.
    - **external:** never. Report the fix for the maintainer.
-4. **Fix drafters** (when used) get the fix drafter brief: only the validated findings for their files, the exact corrected text where you have it, and their file list. Run them in one message. Each returns, per file, exact `old text` / `new text` pairs; check each pair against the finding it answers, then apply it with your own edit tool.
+4. **Fix drafters and placers** (when used) get their brief: only the validated findings for their files, the exact corrected text where you have it, and their file list. Run them all in one message. Each returns, per file, exact `old text` / `new text` pairs; check each pair against the finding it answers, then apply it with your own edit tool. For placers, escalate as `reference/checker-escalation.md` says: items marked `NEEDS-JUDGEMENT`, a reply missing files or fixes or in the wrong shape, or a spot check (at least 3 pairs, or all) where an `old text` isn't in the file exactly once or a `new text` differs from yours, go to `docs:reviewer` with the fix drafter brief. Never re-run them on the checker.
 5. Afterwards, check that `git status --porcelain` shows changes only in files you planned to edit. Revert anything else.
 
 ## Step 6: Verify
@@ -136,5 +142,6 @@ First delete the saved diffs (`<diff_dir>`, Step 2), on every run, `audit-only` 
    - **Findings by verdict:** counts per confirmed, partly true, not real, unverified; then the not-real ones in a line each (so the maintainer sees what didn't hold) and the unverified ones with why.
    - **Needs the maintainer:** edits waiting on permission, external drift with the fix, proposed new records (ADRs), code bugs found on the way, pre-existing check failures; each with your recommendation.
    - **Size watch** and **profile suggestions,** a line each.
+   - **Escalations** (when fix placers ran): one line per unit and reason, and the per-role count, as `reference/checker-escalation.md` says, including its recommendation if placers escalated in more than about a third of their units.
    - **Checks:** pass or fail.
    - **Marker:** the new SHA (or "not moved", and why), and the commit hash, or "not committed".

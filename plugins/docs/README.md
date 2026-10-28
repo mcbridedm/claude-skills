@@ -8,6 +8,7 @@ Skills that keep a project's documentation true.
 
 ## Agents
 
-- `docs:reviewer` ([agents/reviewer.md](agents/reviewer.md)): the read-only auditor and fix drafter that docs-sync dispatches. Tools: Read, Grep, Glob; no shell, no editing, no web. It returns findings and exact replacements; the lead makes every edit.
+- `docs:reviewer` ([agents/reviewer.md](agents/reviewer.md)): the read-only auditor and fix drafter that docs-sync dispatches, on the session's model. Tools: Read, Grep, Glob; no shell, no editing, no web. It returns findings and exact replacements; the lead makes every edit.
+- `docs:checker` ([agents/checker.md](agents/checker.md)): the read-only fix placer for docs-sync's mechanical work: placing fixes whose exact text the lead already validated. Same tools as the reviewer; `model: sonnet`. It marks anything that needs judgement `NEEDS-JUDGEMENT` instead of guessing, and the lead re-runs those, malformed replies and failed spot checks with the reviewer (the skill's `reference/checker-escalation.md`). A profile's `models: { checker: inherit }` turns it off.
 
 Install: see the [repository README](../../README.md#install).
