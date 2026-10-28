@@ -1,5 +1,5 @@
 // The protected-paths hook (protected-paths.mjs): what it blocks and what it lets through.
-// Run: node --test .claude/hooks/ once copied into a project (or this folder, in the skills repository).
+// Run: node --test .claude/hooks/protected-paths.test.mjs once copied into a project (or this file's path here).
 import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
 import { mkdirSync, mkdtempSync, writeFileSync } from "node:fs";

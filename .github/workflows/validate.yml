@@ -22,4 +22,4 @@ jobs:
           persist-credentials: false
       # The runner image ships Node; the script needs no dependencies.
       - run: node scripts/validate.mjs
-      - run: node --test plugins/setup/skills/project-setup/hooks/protected-paths/
+      - run: node --test plugins/setup/skills/project-setup/hooks/protected-paths/protected-paths.test.mjs
