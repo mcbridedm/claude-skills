@@ -2,6 +2,12 @@
 
 All notable changes to this repository are recorded here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versions are per plugin, as set in each `plugin.json`, and follow [Semantic Versioning](https://semver.org/).
 
+## setup 0.3.4 - 2026-10-29
+
+### Changed
+
+- `project-setup`, the protected-paths hook's tests: more cases for the `~` and `$` handling of `cd`, `pushd` and `git -C` targets (`${HOME}`, `pushd ~/...`, `"${dir}"`, `git -C ~/...` and `git -C $HOME/...` writes; `cd $HOME`, a `cd` from an unknown folder to an absolute one, and `git -C ~/...` reads). The hook is unchanged.
+
 ## code-quality 0.7.0 - 2026-10-29
 
 ### Added

@@ -52,6 +52,10 @@ const blocked = [
   ["cd \"$dir\" && echo x > release", ""],
   ["cd - && rm release", ""],
   ["cd \"$dir\" && cd scripts && touch x", ""],
+  ["cd ${HOME}/project/deploy && rm envs/x.tf", ""],
+  ["pushd ~/project/deploy/scripts && touch x", ""],
+  ["cd \"${dir}\" && rm release", ""],
+  ["cd \"$dir\" && cd .. && echo x > release", ""],
   // Downloads, archives, fixers and other writers.
   ["curl -fsSL -o deploy/scripts/x https://example.com/x", ""],
   ["curl -fsSL --output=.github/x.yml https://example.com/x", ""],
@@ -66,6 +70,8 @@ const blocked = [
   ["git -C deploy/scripts checkout -- release", ""],
   ["git -C /repo/.github restore workflows/ci.yml", ""],
   ["git -C \"$dir\" checkout -- release", ""],
+  ["git -C ~/project/.github restore workflows/ci.yml", ""],
+  ["git -C $HOME/project/deploy checkout -- scripts/release", ""],
   ["cp -t deploy/scripts /tmp/x", ""],
   ["install --target-directory=.github/workflows /tmp/x.yml", ""],
 ];
@@ -97,6 +103,10 @@ const allowed = [
   ["cd ~ && echo x > notes.txt", ""],
   ["cd ~/project/deploy && cd .. && echo x > notes.txt", ""],
   ["cd \"$dir\" && cat release", ""],
+  ["cd $HOME && echo x > notes.txt", ""],
+  ["cd ${HOME}/project && echo x > notes.txt", ""],
+  ["cd \"$dir\" && cd /tmp && echo x > notes.txt", ""],
+  ["git -C ~/project/deploy log --oneline -3", ""],
   // Writers pointed elsewhere, and readers given a protected folder.
   ["tar -czf /tmp/deploy.tgz -C deploy .", ""],
   ["curl -fsS -o /tmp/x https://example.com/deploy/x", ""],
