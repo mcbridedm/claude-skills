@@ -31,7 +31,7 @@ The hook is in this skill's `hooks/protected-paths/` folder:
 | File | What it is |
 |---|---|
 | `protected-paths` | The hook command (bash). Runs the checker with whatever Node it finds; without Node it still blocks, roughly. |
-| `protected-paths.mjs` | The checker: splits the command line and blocks redirections, `sed -i`, `tee`, `cp`/`mv` into, `rm`, `git checkout`/`restore`, `find -delete`, and inline scripts that write under a protected path. |
+| `protected-paths.mjs` | The checker: splits the command line and blocks redirections, `sed -i`, `awk -i inplace`, `tee`, `cp`/`mv` into (also `-t`/`--target-directory`), `rm`, `git checkout`/`restore`, `find -delete`, downloads (`curl -o`, `wget -O`), `tar -x` into, `--write`/`--fix` formatters, and inline scripts that write under a protected path. It follows `cd`, `pushd` and `git -C` within one command, judging relative paths from the new folder; a folder it can't resolve (`cd "$dir"`, `cd -`) counts as protected, and a `~` or `$HOME` target is taken literally. |
 | `protected-paths.test.mjs` | Its test (`node --test`), on its own example paths. |
 | `protected-paths.example.json` | An example config. |
 

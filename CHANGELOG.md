@@ -66,6 +66,12 @@ All notable changes to this repository are recorded here. The format follows [Ke
 - README "Layout" and CONTRIBUTING section 2: plugins may ship `agents/`; review sub-agents use the plugin's own read-only agent; Bash only when unavoidable, and said so.
 - `scripts/validate.mjs`: checks each plugin's `agents/*.md` for front matter with `name` (matching the file name), `description` and `tools`, and that an agent granting Bash says so in its description.
 
+## setup 0.3.2 - 2026-10-28
+
+### Changed
+
+- `project-setup`, the protected-paths hook: follows `cd` and `pushd` within one command (relative paths after them are judged from the new folder, also inside a subshell's parentheses) and `git -C <dir>`. A folder it can't resolve (`cd "$dir"`, `cd -`) counts as protected; a `~` or `$HOME` target is taken literally. It also blocks `cp`/`mv`/`install -t` and `--target-directory` into a protected folder, `curl -o`/`-O`, `wget -O`/`-P`, `tar -x -C`, `--write` and `--fix` (prettier, eslint and other formatters), and `awk -i inplace`. Its test has 40 more cases (81 in all).
+
 ## setup 0.3.1 - 2026-10-28
 
 ### Changed

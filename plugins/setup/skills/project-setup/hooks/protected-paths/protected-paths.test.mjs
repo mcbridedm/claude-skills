@@ -39,6 +39,35 @@ const blocked = [
   ["sed -i '' 's/a/b/' release", "/home/me/project/deploy/scripts"],
   ["echo x > release", "/home/me/project/deploy/scripts"],
   ["export PATH=/x:$PATH && sed -i '' 's/a/b/' deploy/release", ""],
+  // A cd or pushd first: relative paths after it are judged from there.
+  ["cd deploy/scripts && echo x > release", ""],
+  ["cd .github/workflows && sed -i '' s/a/b/ ci.yml", ""],
+  ["cd /home/me/project/deploy && rm envs/x.tf", ""],
+  ["pushd deploy/scripts && cp /tmp/x release", ""],
+  ["(cd deploy/scripts && chmod +x release)", ""],
+  // A cd to ~ or $HOME is taken literally; one it can't resolve counts as protected.
+  ["cd ~/project/deploy/scripts && echo x > release", ""],
+  ["cd $HOME/project/.github/workflows && sed -i '' s/a/b/ ci.yml", ""],
+  ["cd \"$REPO/deploy/scripts\" && cp /tmp/x release", ""],
+  ["cd \"$dir\" && echo x > release", ""],
+  ["cd - && rm release", ""],
+  ["cd \"$dir\" && cd scripts && touch x", ""],
+  // Downloads, archives, fixers and other writers.
+  ["curl -fsSL -o deploy/scripts/x https://example.com/x", ""],
+  ["curl -fsSL --output=.github/x.yml https://example.com/x", ""],
+  ["cd deploy/scripts && curl -O https://example.com/x", ""],
+  ["wget -O deploy/scripts/x https://example.com/x", ""],
+  ["tar -xzf /tmp/x.tgz -C deploy/scripts", ""],
+  ["tar xf /tmp/x.tar --directory=.github", ""],
+  ["npx prettier --write .github/workflows/ci.yml", ""],
+  ["npx eslint --fix deploy/functions/handler.mjs", ""],
+  ["awk -i inplace '{print}' deploy/scripts/release", ""],
+  // git -C and cp -t.
+  ["git -C deploy/scripts checkout -- release", ""],
+  ["git -C /repo/.github restore workflows/ci.yml", ""],
+  ["git -C \"$dir\" checkout -- release", ""],
+  ["cp -t deploy/scripts /tmp/x", ""],
+  ["install --target-directory=.github/workflows /tmp/x.yml", ""],
 ];
 
 const allowed = [
@@ -57,6 +86,23 @@ const allowed = [
   ["echo hi > /tmp/out.txt", "/home/me/project/deploy"],
   ["rm -rf build", ""],
   ["rm -rf deployment-notes", ""],
+  ["git merge --no-ff origin/topic", ""],
+  ["node --test deploy/functions/", ""],
+  ["pnpm lint && pnpm typecheck", "/home/me/project/deploy/scripts"],
+  // A cd that reads, leaves the protected folder, or goes elsewhere.
+  ["cd deploy/scripts && cat release", ""],
+  ["cd deploy/scripts && cd ../.. && echo x > notes.txt", ""],
+  ["cd apps/web && echo x > /tmp/y", ""],
+  ["cd ~/project && echo x > notes.txt", ""],
+  ["cd ~ && echo x > notes.txt", ""],
+  ["cd ~/project/deploy && cd .. && echo x > notes.txt", ""],
+  ["cd \"$dir\" && cat release", ""],
+  // Writers pointed elsewhere, and readers given a protected folder.
+  ["tar -czf /tmp/deploy.tgz -C deploy .", ""],
+  ["curl -fsS -o /tmp/x https://example.com/deploy/x", ""],
+  ["git -C deploy/scripts log --oneline -3", ""],
+  ["npx prettier --write apps/web/src/x.ts", ""],
+  ["docker run --rm -v /repo/deploy:/deploy -w /repo alpine:3 ls", ""],
   // Editing a doc whose text mentions the folders.
   [`python3 -I - <<'EOF'\np='README.md'; s=open(p).read()\nb="refuses shell writes under \`deploy/\` (hook)"\nopen(p,'w').write(s+b)\nEOF`, ""],
 ];
