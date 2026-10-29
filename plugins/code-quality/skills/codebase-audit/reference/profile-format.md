@@ -22,6 +22,7 @@ followups:                        # where open findings are recorded; omit to ke
   file: ROADMAP.md
   section: "## Follow-ups"
 commit: true                      # commit the report folder, the index and the follow-ups
+commit_command: "make check && git commit"   # how a commit is made, if the project chains it; default: git commit
 push: false
 ---
 ```
@@ -47,5 +48,6 @@ push: false
 - **rules:** CLAUDE.md, AGENTS.md, CONTRIBUTING.md, a principles file, if present. **decided:** an ADR folder, if present.
 - **checks:** whatever the repository's manifest or CI config shows for lint, typecheck and test.
 - **commit:** true. **push:** false.
+- **commit_command:** from CLAUDE.md or AGENTS.md if they say how commits are made (e.g. a check chained before `git commit`), else `git commit`.
 
 See `example-profile.md` for a filled-in profile.

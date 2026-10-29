@@ -134,13 +134,13 @@ Run the profile's `checks` (default: the project's lint, typecheck and test comm
 3. **Move the marker to the head SHA:** a one-line file at the profile's `marker` path (default `<report_dir>/LAST_REVIEWED`) holding the SHA. Move it only after the report is written. A failed or partial run leaves the marker where it was.
 4. **Record follow-ups** where the profile's `followups` setting says (e.g. a checklist section in a roadmap file), one line per finding the user hasn't fixed, with its id.
 5. **Delete the saved diffs** (`<diff_dir>`) and remove the temporary worktree if you made one.
-6. **Commit** the report, the index, the marker and the follow-ups if the profile's `commit` is true (the default). Push only if its `push` is true.
+6. **Commit** the report, the index, the marker and the follow-ups if the profile's `commit` is true (the default), with the profile's `commit_command` (default `git commit`). Push only if its `push` is true.
 
 ## Step 7: Fixes, if asked
 
 If the argument included `fix`, or the user says yes when you offer:
 - fix CONFIRMED findings, most severe first;
-- one commit per finding (or per tightly related group), each with a test that fails before the fix and passes after, when one can be written;
+- one commit per finding (or per tightly related group), made with the profile's `commit_command`, each with a test that fails before the fix and passes after, when one can be written;
 - leave PLAUSIBLE findings to the user unless they ask;
 - after fixing, rerun the checks and update the report's table: fixed, in which commit.
 

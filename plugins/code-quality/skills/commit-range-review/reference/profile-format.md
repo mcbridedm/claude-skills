@@ -24,6 +24,7 @@ followups:                        # where unfixed findings are recorded; omit to
   file: ROADMAP.md
   section: "## Follow-ups"
 commit: true                      # commit the report, index, marker and follow-ups
+commit_command: "make check && git commit"   # how a commit is made, if the project chains it; default: git commit
 push: false
 ---
 ```
@@ -43,5 +44,6 @@ push: false
 - **checks:** whatever the repository's manifest or CI config shows for lint, typecheck and test.
 - **rules:** CLAUDE.md, AGENTS.md, CONTRIBUTING.md and an ADR folder, if present.
 - **commit:** true. **push:** false.
+- **commit_command:** from CLAUDE.md or AGENTS.md if they say how commits are made (e.g. a check chained before `git commit`), else `git commit`.
 
 See `example-profile.md` for a filled-in profile.

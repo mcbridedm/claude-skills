@@ -15,6 +15,7 @@ followups:
   file: ROADMAP.md
   section: "### Code to fix"
 commit: true
+commit_command: "npm run lint && npm test && git commit"
 push: true
 ---
 

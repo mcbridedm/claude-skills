@@ -135,7 +135,7 @@ Run the profile's `checks` (default: the project's lint and test commands, if fo
 First delete the saved diffs (`<diff_dir>`, Step 2), on every run, `audit-only` included.
 
 1. **Marker:** write the head SHA to the profile's `marker` path (default `docs/.last-docs-sync`), only after a complete run with checks green. A partial, failed or `audit-only` run leaves it where it was.
-2. **Commit** if the profile's `commit` is true (the default with a profile; without one, only if the user said so): stage only the files this run edited and the marker (never `git add -A`), in one commit with the profile's `commit_message` (default `Docs sync: <base short>..<head short>`), ending with the repository's attribution line. **Push** only if the profile's `push` is true (default false).
+2. **Commit** if the profile's `commit` is true (the default with a profile; without one, only if the user said so): stage only the files this run edited and the marker (never `git add -A`), in one commit made with the profile's `commit_command` (default `git commit`; e.g. a check chained before it), with the profile's `commit_message` (default `Docs sync: <base short>..<head short>`), ending with the repository's attribution line. **Push** only if the profile's `push` is true (default false).
 3. **Reply** in chat, short and plain:
    - **Scope:** the range, commits and date span.
    - **Files changed, per group:** each file with a few words on what changed.

@@ -11,6 +11,7 @@ checks:
   - npm run lint
   - npm test
 commit: true
+commit_command: "npm run lint && npm test && git commit"
 push: false
 commit_message: "Docs sync: <range>"
 ---

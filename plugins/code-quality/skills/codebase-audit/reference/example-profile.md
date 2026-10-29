@@ -20,6 +20,7 @@ followups:
   file: ROADMAP.md
   section: "## Audit follow-ups"
 commit: true
+commit_command: "make lint && make test && git commit"
 push: false
 ---
 

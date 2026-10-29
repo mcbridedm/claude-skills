@@ -52,7 +52,7 @@ docs/reviews/code/YYYY-MM-DD/
 docs/reviews/code/LAST_REVIEWED        the last reviewed commit (one line)
 ```
 
-Plus one commit (if the profile's `commit` is on, the default). Paths are profile settings.
+Plus one commit (if the profile's `commit` is on, the default), made with the profile's `commit_command` (default `git commit`; e.g. a check chained before it). Paths are profile settings.
 
 ## Cost
 

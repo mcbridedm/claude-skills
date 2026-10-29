@@ -21,7 +21,7 @@ Audits the whole codebase **as it stands at one commit** against its own documen
 5. **Audits:** each auditor checks every concrete claim in its documents against the code, the project's rules, correctness, security, tests and dead code, and lists every file it read. Auditors are the plugin's `code-quality:reviewer` agent: Read, Grep and Glob only, no shell, editing or web, so read-only is enforced by its tool list; they read a checkout at the pinned commit, and tests and commands are the lead's.
 6. **Verifies every finding** at the pinned commit, and for each code-versus-document disagreement decides which side is wrong: **code wrong** (a defect), **document wrong** (for the docs sync), or **maintainer decides** (both plausible, nothing recorded settles it).
 7. **Proves coverage:** files not read get an extra wave; anything still unread is listed as not audited. A file is never counted as audited because its slice was.
-8. **Runs the checks**, writes the report (with "since the last audit": which earlier findings are resolved), the index row and the follow-ups, and commits if the profile says so.
+8. **Runs the checks**, writes the report (with "since the last audit": which earlier findings are resolved), the index row and the follow-ups, and commits if the profile says so, with its `commit_command` (default `git commit`; e.g. a check chained before it).
 9. **Fixes, if asked:** code findings only, one commit each with a test. Document fixes go to `docs-sync`; maintainer decisions to the maintainer.
 
 ## Cost and when to run it

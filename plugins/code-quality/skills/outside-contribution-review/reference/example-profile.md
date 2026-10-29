@@ -6,6 +6,7 @@ path_map:
   "site/": "docs/site/"
 bring_in: import
 bring_in_command: "scripts/import-pr.sh {pr}"
+commit_command: "make check && git commit"
 standards:                       # public: shipped to the mirror, citable in verdicts
   - docs/site/STYLE.md
   - docs/site/CONTRIBUTING.md

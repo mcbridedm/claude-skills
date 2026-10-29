@@ -10,7 +10,7 @@
 
   Add `audit-only` to get the validated findings without any edits.
 - **Produces:** corrected docs, dated notes in ledgers, regenerated files, the marker, one commit (by default), and a short report in chat.
-- **Side effects:** edits only the files in the profile's document groups, the marker, and (with your OK) the profile. Asks before editing protected paths. Never edits external systems, never fixes code, never archives or splits files on its own. Commits by default; never pushes unless the profile says so.
+- **Side effects:** edits only the files in the profile's document groups, the marker, and (with your OK) the profile. Asks before editing protected paths. Never edits external systems, never fixes code, never archives or splits files on its own. Commits by default, with the profile's `commit_command` (default `git commit`); never pushes unless the profile says so.
 
 ## What it does
 
@@ -39,7 +39,7 @@ The repository's rule is `disable-model-invocation: true` for skills that spawn 
 
 ## Profile
 
-Project specifics live at `.claude/docs-sync.md`: the document groups (each with its kind, files and what each is the source of truth for, triggers, checks and rules), change kinds, protected paths, checks, the marker, size thresholds, archiving conventions, and whether to commit and push. Group kinds are `docs`, `ledger` (append-only), `generated` (regenerated, never hand-edited) and `external` (checked only). See [reference/profile-format.md](reference/profile-format.md) and the fictional [example](reference/example-profile.md). The brief auditors get is in [reference/auditor-brief.md](reference/auditor-brief.md).
+Project specifics live at `.claude/docs-sync.md`: the document groups (each with its kind, files and what each is the source of truth for, triggers, checks and rules), change kinds, protected paths, checks, the marker, size thresholds, archiving conventions, whether to commit and push, and how a commit is made (`commit_command`, e.g. a check chained before `git commit`). Group kinds are `docs`, `ledger` (append-only), `generated` (regenerated, never hand-edited) and `external` (checked only). See [reference/profile-format.md](reference/profile-format.md) and the fictional [example](reference/example-profile.md). The brief auditors get is in [reference/auditor-brief.md](reference/auditor-brief.md).
 
 ## Context check
 

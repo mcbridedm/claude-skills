@@ -110,12 +110,12 @@ Run the profile's `checks` at the pinned commit (default: the project's lint, ty
    Finding ids are `<run>-NN`.
 2. **Add a row to `<report_dir>/README.md`**, the index, creating it if needed: date, commit, coverage, findings by severity and kind, and a link.
 3. **Record follow-ups** where the profile's `followups` says: one line per open code finding with its id, and one line pointing the docs sync at the "document wrong" findings.
-4. **Commit** the report folder, the index and the follow-ups if the profile's `commit` is true (the default). Push only if its `push` is true. Remove the temporary worktree if you made one.
+4. **Commit** the report folder, the index and the follow-ups if the profile's `commit` is true (the default), with the profile's `commit_command` (default `git commit`). Push only if its `push` is true. Remove the temporary worktree if you made one.
 
 ## Step 9: Fixes, if asked
 
 If the argument included `fix`, or the user says yes when you offer:
-- fix CONFIRMED **defect**, **code wrong** and **rule broken** findings, most severe first, one commit per finding or tight group, each with a test that fails before and passes after when one can be written;
+- fix CONFIRMED **defect**, **code wrong** and **rule broken** findings, most severe first, one commit per finding or tight group (made with the profile's `commit_command`), each with a test that fails before and passes after when one can be written;
 - leave **document wrong** findings to the docs sync, **maintainer decides** to the maintainer, and PLAUSIBLE findings to the user unless they ask;
 - rerun the checks and update the report's table: fixed, in which commit.
 

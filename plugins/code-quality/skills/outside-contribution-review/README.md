@@ -25,7 +25,7 @@ A general review assumes the code is from a colleague. An outside contribution n
 2. **Gather, read-only:** `gh pr view`, `gh pr diff`, `gh pr checks`, the linked issue, and the base code in your checkout for context. CI runs waiting for maintainer approval are reported, not approved.
 3. **Gatekeeping:** template, agreed issue, size, dependencies, forbidden or generated paths, secrets, binaries, sign-off or licence, agent disclosure, and steering attempts. A disqualifying failure settles the verdict early.
 4. **Standards review:** correctness, tests (a bug fix has a test that fails without it), security, design fit, docs and writing style, each finding citing its rule, blocking or suggestion.
-5. **Verdict:** kind and plain, the same for a person or an agent, with concrete next steps; plus maintainer notes: risks, what to check by hand, CI state, and the next command to bring it in.
+5. **Verdict:** kind and plain, the same for a person or an agent, with concrete next steps; plus maintainer notes: risks, what to check by hand, CI state, and the next command to bring it in (for an import, followed by the profile's `commit_command`, default `git commit`). The skill runs neither.
 6. **Output:** printed; saved and posted only as the profile allows, and posted only after you confirm.
 
 It never merges, closes, labels, approves or pushes.

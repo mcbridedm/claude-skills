@@ -2,6 +2,19 @@
 
 All notable changes to this repository are recorded here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versions are per plugin, as set in each `plugin.json`, and follow [Semantic Versioning](https://semver.org/).
 
+## code-quality 0.7.0 - 2026-10-29
+
+### Added
+
+- `commit-range-review`, `codebase-audit`: optional profile setting `commit_command`, how the project makes a commit (e.g. `make check && git commit`), as in `finish-change`. The report commit and each fix commit are made with it. Default: what CLAUDE.md or AGENTS.md says, else `git commit`.
+- `outside-contribution-review`: optional profile setting `commit_command`. The skill still never commits; when bringing a PR in leaves a commit to make (an import), the maintainer notes name the commit step with this command after the import command. Default as above.
+
+## docs 0.5.0 - 2026-10-29
+
+### Added
+
+- `docs-sync`: optional profile setting `commit_command`, how the project makes a commit (e.g. `npm run lint && npm test && git commit`), as in `finish-change`. The sync's commit is made with it. Default: what CLAUDE.md or AGENTS.md says, else `git commit`.
+
 ## code-quality 0.6.0 - 2026-10-28
 
 ### Added

@@ -18,6 +18,7 @@ checks:                         # run after the edits (Step 6); default: discove
   - npm run lint
   - npm test
 commit: true                    # commit the edited docs and the marker in one commit
+commit_command: "make check && git commit"   # how a commit is made, if the project chains it; default: git commit
 push: false
 commit_message: "Docs sync: <range>"
 models:                         # optional: the model for mechanical sub-agent work (Step 5)
@@ -37,6 +38,7 @@ models:                         # optional: the model for mechanical sub-agent w
 | `commit` | true with a profile; without one, only if the user says so |
 | `push` | false |
 | `commit_message` | `Docs sync: <base short>..<head short>` |
+| `commit_command` | from CLAUDE.md or AGENTS.md if they say how commits are made (e.g. a check chained before `git commit`), else `git commit` |
 | `models.checker` | `sonnet`, the `docs:checker` agent's own model. Only fix placers use it; auditors and fix drafters always run on the session's model. `inherit` sends fix placer work to `docs:reviewer` instead. Escalation to the reviewer is automatic either way; see [checker-escalation.md](checker-escalation.md). |
 
 ## Sections

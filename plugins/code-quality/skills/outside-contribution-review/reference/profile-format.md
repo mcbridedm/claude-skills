@@ -14,6 +14,8 @@ path_map:                            # mirror path prefix -> source path prefix,
 bring_in: import                     # merge | import
 bring_in_command: "scripts/import-pr.sh {pr}"   # the exact next command for an accepted PR; {pr} = number
                                      # default for merge: gh pr merge {pr} --repo {pr_repo} --squash
+commit_command: "make check && git commit"   # how a commit is made in the source repository, if the project
+                                     # chains it (for import: the step after bring_in_command); default: git commit
 standards:                           # PUBLIC rules: the contributor's part may cite and quote these.
   - STANDARDS.md                     # read from the trusted base branch; default: discovered (Step P)
   - CONTRIBUTING.md
@@ -60,6 +62,7 @@ post: false                          # allow posting part 1 as a PR comment (the
 
 - **pr_repo:** the URL in the argument, else `gh repo view --json nameWithOwner`. **source_repo:** none.
 - **bring_in:** merge; the command is `gh pr merge {pr} --repo {pr_repo} --squash`.
+- **commit_command:** from CLAUDE.md or AGENTS.md if they say how commits are made (e.g. a check chained before `git commit`), else `git commit`.
 - **maintainer_context:** none. Without a profile, anything not visible in the PR's own repository is treated as maintainer context.
 - **standards:** CONTRIBUTING.md, STANDARDS.md, PRINCIPLES.md, CODE_OF_CONDUCT.md, CLAUDE.md or AGENTS.md, a style guide, and an ADR folder, if present.
 - **required_checks:** branch protection's required checks if readable, else the workflows that run on `pull_request`.
