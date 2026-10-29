@@ -44,7 +44,7 @@ export function compile(config) {
     // A bare folder name in a command line (`find infra -delete`) counts too.
     mention: new RegExp(`(^|[^\\w.-])(${alt})(\\/|[\\s'"]|$)`),
     // In inline code, a protected path written as a path: a quoted string with no spaces that
-    // names one ('infra/home/deploy'), not prose that mentions the folder. Backticks don't count:
+    // names one ('deploy/scripts/release'), not prose that mentions the folder. Backticks don't count:
     // in Markdown they mark `infra/` as code, not a path being written.
     pathLiteral: new RegExp(`(['"])([^'"\\s]*\\/)?(${alt})\\/[^'"\\s]*\\1`),
     rewriters: (config?.rewriters ?? []).map((r) => ({
