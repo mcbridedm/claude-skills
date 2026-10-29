@@ -2,6 +2,12 @@
 
 All notable changes to this repository are recorded here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versions are per plugin, as set in each `plugin.json`, and follow [Semantic Versioning](https://semver.org/).
 
+## code-quality 0.6.0 - 2026-10-28
+
+### Added
+
+- `finish-change`: finishes a change the same way every time. Step 1 verifies it end to end in a throwaway instance of the running app (the profile's verify skill or command, or discovered: a project run skill, the end-to-end tests' setup, the dev command), writing what's expected before looking and evidence lines after (`reference/verify-by-surface.md` for web, API, CLI, jobs and libraries); step 2 runs `/simplify`; step 3 the project's checks; step 4 commits only this change's files with a "Verified:" block, and pushes only if the profile says so. Profile `.claude/finish-change.md` (`reference/profile-format.md`, with discovery and an example). `disable-model-invocation: true`, since it commits.
+
 ## docs 0.4.0 - 2026-10-28
 
 ### Added
