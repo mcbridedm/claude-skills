@@ -33,6 +33,7 @@ jobs/
 - **Logs:** `~/Library/Logs/claude-jobs/` (macOS) or `~/.local/state/claude-jobs/` (Linux).
 - **Pause:** `touch ~/.claude/jobs-state/paused-<name>` (or `paused` for all).
 - **Needs a person:** a reply line starting `OWNER:` raises a desktop notification.
+- **Failed runs retry:** a run that couldn't do its job ends with a `FAILED:` line, which also notifies; the guard's new fingerprint is then dropped, so the next run tries again even if nothing changed.
 
 ## Cost
 

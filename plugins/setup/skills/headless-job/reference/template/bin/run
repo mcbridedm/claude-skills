@@ -1,11 +1,14 @@
 #!/bin/sh
 # Runs one job: jobs/<name>/guard (cheap; exit 0 = work to do, 1 = nothing to do), then Claude Code
 # headless with the job's prompt and only the tools in jobs/<name>/tools. A reply line starting
-# "OWNER:" raises a desktop notification. Scheduled by launchd (macOS) or a systemd timer (Linux).
+# "OWNER:" or "FAILED:" raises a desktop notification. A guard's new fingerprint waits in
+# <state>/<name>.fp.pending and is kept only after a run without "FAILED:", so a failed run is
+# retried next time. Scheduled by launchd (macOS) or a systemd timer (Linux).
 #
 # Job folder: prompt.md (required), tools (required, one per line), guard (optional, executable),
 # model (default sonnet), budget (USD cap per run, default 2), workdir (default $HOME).
-set -u
+# -f: no filename expansion, so a tool rule like Bash(gh pr list:*) is never matched against files.
+set -uf
 PATH="/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:$HOME/.local/bin:$PATH"
 JOBS=$(cd "$(dirname "$0")/.." && pwd)
 name=$1; dir="$JOBS/$name"
@@ -31,6 +34,8 @@ echo "$(stamp) $name: starting Claude" >>"$log"
 out=$(claude -p "$(cat "$dir/prompt.md")" --allowedTools $tools --permission-mode dontAsk \
   --model "$(cat "$dir/model" 2>/dev/null || echo sonnet)" --max-budget-usd "$(cat "$dir/budget" 2>/dev/null || echo 2)" 2>&1)
 printf '%s\n%s\n' "$out" "$(stamp) $name: done" >>"$log"
-owner=$(printf '%s\n' "$out" | grep '^OWNER:' | head -3 | cut -c8-200)
+if printf '%s\n' "$out" | grep -q '^FAILED:'; then rm -f "$state/$name.fp.pending"
+elif [ -f "$state/$name.fp.pending" ]; then mv "$state/$name.fp.pending" "$state/$name.fp"; fi
+owner=$(printf '%s\n' "$out" | grep -E '^(OWNER|FAILED):' | head -3 | cut -c1-200)
 [ -n "$owner" ] && notify "$name" "$owner"
 exit 0

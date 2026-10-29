@@ -2,9 +2,11 @@
 # Example guard: start Claude only when what the job watches has changed since the last run.
 # Replace the command with whatever is cheap to ask (an API, `gh`, a CLI with --json).
 # Exit 0 = start Claude, 1 = nothing to do. $1 is the state folder.
+# The new fingerprint goes to <name>.fp.pending; bin/run keeps it only after a run that didn't
+# fail, so a failed run is retried next time even if nothing changed.
 set -u
 state=$1
 fp=$(gh pr list --state open --json number,updatedAt 2>/dev/null | shasum | cut -d' ' -f1) || exit 0
 last=$(cat "$state/example-job.fp" 2>/dev/null || true)
-echo "$fp" >"$state/example-job.fp"
+echo "$fp" >"$state/example-job.fp.pending"
 [ "$fp" != "$last" ]

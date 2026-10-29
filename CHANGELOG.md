@@ -66,6 +66,14 @@ All notable changes to this repository are recorded here. The format follows [Ke
 - README "Layout" and CONTRIBUTING section 2: plugins may ship `agents/`; review sub-agents use the plugin's own read-only agent; Bash only when unavoidable, and said so.
 - `scripts/validate.mjs`: checks each plugin's `agents/*.md` for front matter with `name` (matching the file name), `description` and `tools`, and that an agent granting Bash says so in its description.
 
+## setup 0.3.3 - 2026-10-28
+
+### Fixed
+
+- `headless-job`: a failed run is retried. The template guard writes its new fingerprint to `<name>.fp.pending`, and `bin/run` keeps it only after a run whose reply has no `FAILED:` line; before, the guard saved it before Claude started, so a failed run was skipped until the watched thing changed again. A `FAILED:` line also raises a notification.
+- `headless-job`: the template prompt names every allowed command exactly as the `tools` rules match it and says any other shell command is refused by design. Without that, a job whose first shell command (a `grep`) was refused concluded the shell was unavailable and stopped without trying the commands it was allowed. SKILL.md Step 2 says to write prompts this way.
+- `headless-job`: `bin/run` sets `-f`, so a tool rule such as `Bash(gh pr list:*)` is never expanded against file names.
+
 ## setup 0.3.2 - 2026-10-28
 
 ### Changed
