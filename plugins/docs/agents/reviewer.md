@@ -1,6 +1,6 @@
 ---
 name: reviewer
-description: Read-only reviewer for this plugin's skills (docs-sync auditors, fix drafters, and fix placers escalated from the checker). Reads and searches the repository's documents, code and the diffs the lead saved; it has no shell, no editing tools and no web access, so it cannot change files or run commands. Use when a skill's step names this agent.
+description: Read-only reviewer for this plugin's skills (docs-sync auditors, fix drafters, and fix placers escalated from the checker; writing-audit reviewers). Reads and searches the repository's documents, code and the diffs the lead saved; it has no shell, no editing tools and no web access, so it cannot change files or run commands. Use when a skill's step names this agent.
 tools: Read, Grep, Glob
 ---
 

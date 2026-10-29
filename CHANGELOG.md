@@ -2,6 +2,13 @@
 
 All notable changes to this repository are recorded here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versions are per plugin, as set in each `plugin.json`, and follow [Semantic Versioning](https://semver.org/).
 
+## docs 0.6.0 - 2026-10-29
+
+### Added
+
+- `writing-audit`: audits what a project has written against its own writing standard, or four default tests (specific, says what was tried, claims checked or labelled, adds something new). Surfaces are `files` (UI copy, message catalogues, docs, guides) or `live` (what the project's bots or agents publish, read with a read-only fetch command into a scratch folder that's deleted afterwards). Read-only `docs:reviewer` agents in parallel (`reference/reviewer-brief.md`); claims about the product checked against the profile's sources of truth; the lead verifies every claims finding that isn't borderline, every one it calls worst, and two others per reviewer. The report (`reference/report-format.md`) has ids `<prefix>-<date>-NN`, statuses verified, plausible, borderline, a "Didn't hold" list, and the causes behind repeated failures with where each fix belongs. Never fixes, posts or edits copy; commits the report by default, never pushes. Profile `.claude/writing-audit.md` (`reference/profile-format.md`, with discovery and an example). `disable-model-invocation: true`.
+- `docs:reviewer`'s description names writing-audit's reviewers.
+
 ## setup 0.3.4 - 2026-10-29
 
 ### Changed

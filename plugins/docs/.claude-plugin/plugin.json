@@ -1,8 +1,8 @@
 {
   "name": "docs",
   "displayName": "Docs",
-  "version": "0.5.0",
-  "description": "Documentation skills: a profile-driven docs sync that brings a project's docs, ledgers, generated files and project state back in line with the code, with parallel read-only audits, every finding validated before it's fixed, and a marker so the next sync resumes.",
+  "version": "0.6.0",
+  "description": "Documentation skills: a profile-driven docs sync that brings a project's docs, ledgers, generated files and project state back in line with the code, with parallel read-only audits, every finding validated before it's fixed, and a marker so the next sync resumes; and a writing audit that checks UI copy, docs and what a project's bots publish against its own writing standard, every product claim against the code.",
   "author": {
     "name": "Devin McBride"
   },
