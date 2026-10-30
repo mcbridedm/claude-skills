@@ -21,6 +21,7 @@ The repository is a Claude Code **plugin marketplace**. Skills are grouped into 
 | `setup` | [project-setup](plugins/setup/skills/project-setup/README.md) | `/setup:project-setup [skills] [guardrails]` | Sets up a project to use these skills: checks which plugins are installed, writes a starter profile for each skill you pick, adds a section to CLAUDE.md or AGENTS.md, and optionally installs guardrails for parallel fix runs (permission ask rules and the protected-paths hook, which refuses shell writes to the folders you name). Shows every change first; never overwrites a profile. Cheap; run once per project, and again after adding a plugin. |
 | `setup` | [practice-watch](plugins/setup/skills/practice-watch/README.md) | `/setup:practice-watch [sources] [since <date> \| full-history] [report-only]` | Keeps your Claude Code setup current: watches the sources you trust (the Claude Code team, its docs and release notes, practitioners) for new tips, triages each against how you already work, recommends with a reason, and writes what you adopt into the right repository (personal config, a project, a skills repository) and pushes it. Records what it has seen; suggests new people to follow. Cheap; run daily or weekly. |
 | `setup` | [headless-job](plugins/setup/skills/headless-job/README.md) | `/setup:headless-job [task and when]` | Turns a recurring task (a check-in, a triage, a daily report) into a headless job that runs outside any session: a cheap shell guard so Claude starts only when there's work, `claude -p` with only the tools the job needs, a model and spend cap, logs, a notification when a person is needed, and a launchd or systemd schedule you install. First judges whether the task can run headless, and says why not when it can't. Cheap. |
+| `ui` | [icon-check](plugins/ui/skills/icon-check/README.md) | `/ui:icon-check [app folder]` | Renders the project's icons at the sizes people see them on one review sheet (PNG): favicons at 16 and 32 px with pixel zooms, in mocked light and dark browser tab bars at 1× and Retina, and the manifest, maskable (with Android's safe circle) and Apple touch icons. Reports missing sizes, an SVG favicon that overrides hand-tuned PNGs and maskable content outside the safe zone, then judges how the small sizes read. Never edits icons. Cheap; Claude may start it right after an icon changes. |
 
 ## How they fit together
 
@@ -42,6 +43,7 @@ The skills are built to be used as a rhythm, not one-offs: cheap checks with eve
 | **Before opening to more users**, or after a big change to what users see | `user-panel-review` | High: one agent per persona; needs the app running locally on a throwaway instance | Simulated users and bad actors try the running product from the outside. |
 | **Before a launch**, or after a big change to what users read (a redesign, a new guide, a bot's new prompt) | `writing-audit` | Medium: 3 to 5 read-only reviewers, 10 to 20 minutes | Copy drifts from the product quietly, and bots and agents publish more than anyone reads. Every claim is checked against the code; the causes say where to stop it at the source. |
 | **The first time** an environment goes up in the cloud | `cloud-first-apply` | Low: one session, no sub-agents | A step-by-step guide written before anyone applies anything. |
+| **When a logo, favicon or app icon changes** | `icon-check` | Low: one script, seconds | An icon that looks right at 512 px can fall apart at 16 px in a tab; the sheet shows every size people meet it at. |
 
 ### A typical week
 
@@ -75,6 +77,7 @@ In a Claude Code session:
 /plugin install infrastructure@mcbridedm-skills
 /plugin install docs@mcbridedm-skills
 /plugin install setup@mcbridedm-skills
+/plugin install ui@mcbridedm-skills
 ```
 
 Or from the shell: `claude plugin marketplace add mcbridedm/claude-skills` and `claude plugin install architecture@mcbridedm-skills`.
@@ -136,6 +139,7 @@ Each skill reads a profile at `.claude/<skill-name>.md` in the project: Markdown
 | docs-sync | `.claude/docs-sync.md` | the document groups and what makes each stale, the marker file, paths to ask before editing, the checks, the commit command | [format](plugins/docs/skills/docs-sync/reference/profile-format.md), [example](plugins/docs/skills/docs-sync/reference/example-profile.md) |
 | writing-audit | `.claude/writing-audit.md` | the writing standard and its tests, the surfaces (files or live, with a read-only fetch), the sources of truth for claims, where reports and ids go, the tracker, the commit command | [format](plugins/docs/skills/writing-audit/reference/profile-format.md), [example](plugins/docs/skills/writing-audit/reference/example-profile.md) |
 | cloud-first-apply | `.claude/cloud-first-apply.md` | the IaC tool and roots, environments and regions, DNS, secrets, a scale-to-zero mode, where the guide goes | [format](plugins/infrastructure/skills/cloud-first-apply/reference/profile-format.md), [example](plugins/infrastructure/skills/cloud-first-apply/reference/example-profile.md) |
+| icon-check | `.claude/icon-check.md` | the page and manifest to read, web roots, icon files by role (when they're generated at build time), where `sharp` is | [format and example](plugins/ui/skills/icon-check/reference/profile-format.md) |
 
 - **No profile? Run the skill anyway.** It discovers defaults from the repository (README, CLAUDE.md or AGENTS.md, ADR folders, manifests, CI, infrastructure folders, a roadmap or TODO file) and offers to write a starter profile.
 - **Commit the profiles,** so every session and every teammate uses the same ones.
@@ -157,7 +161,7 @@ Add a few lines to the project's CLAUDE.md or AGENTS.md, adapted to your paths:
 - Run a review in a fresh session, not the one that wrote the code.
 ```
 
-Every skill except `design-review` sets `disable-model-invocation: true`, so it runs only when someone types it.
+Every skill except `design-review` and `icon-check` sets `disable-model-invocation: true`, so it runs only when someone types it.
 
 ### 3. Guardrails for fix runs (optional)
 
@@ -204,6 +208,7 @@ plugins/<kind>/
     README.md                       what it does, cost, when to run it, sample output
     reference/                      detail loaded only when a step needs it; shared copies of
                                     context-check.md and, with a checker, checker-escalation.md
+    scripts/                        optional: a script the skill runs (plain Node, few dependencies)
 templates/skill/                    starter files for a new skill, and the shared references' originals
 scripts/validate.mjs                light checks (plain Node, no dependencies)
 .github/workflows/validate.yml      runs the checks on pushes to main and on pull requests

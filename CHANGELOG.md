@@ -2,6 +2,13 @@
 
 All notable changes to this repository are recorded here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versions are per plugin, as set in each `plugin.json`, and follow [Semantic Versioning](https://semver.org/).
 
+## ui 0.1.0 - 2026-10-30
+
+### Added
+
+- New plugin `ui`, for skills that check what users see.
+- `icon-check`: renders a project's icons at the sizes people see them on one review sheet (PNG), with a small Node script (`scripts/icon-sheet.mjs`, only dependency `sharp`, taken from the project or a scratch folder): each favicon at 16 and 32 px at true size with nearest-neighbour zooms (8× and 4×); the favicon in mocked light and dark browser tab bars, active and inactive, beside two neutral placeholder tabs, at 1× and Retina; the manifest's "any" 192 and 512, the maskable icon with Android's 80% safe circle and two launcher crops, and the Apple touch icon with a home-screen preview. Reports an SVG favicon linked beside size-specific PNGs (supporting browsers use the SVG at every size), missing sizes and wrong dimensions, maskable content outside the safe circle, transparent corners, how much of the 16 px tile the drawing fills, and the favicon's weakest contrast against the tab bar shades; Claude then judges the sheet against `reference/guidance.md`. Finds icons from the HTML link tags and the web manifest, or a profile `.claude/icon-check.md` (`reference/profile-format.md`). Never edits icons or commits. Model-invocable, since it's cheap and most useful right after an icon changes.
+
 ## docs 0.6.0 - 2026-10-29
 
 ### Added
