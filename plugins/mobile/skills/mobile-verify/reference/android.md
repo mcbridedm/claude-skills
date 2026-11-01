@@ -71,6 +71,17 @@ adb -s <serial> emu unfold
 adb -s <serial> shell wm size        # confirms the posture took: the folded and open sizes differ
 ```
 
+**Another foldable shape, emulated:** when no emulator profile matches a foldable the app must support (e.g. one with a landscape-shaped inner screen), override the screen of a foldable emulator to that model's resolution and density while it's in the matching posture, relaunch the app, capture, and reset:
+
+```
+adb -s <serial> shell wm size <width>x<height>     # the model's inner (unfolded) or cover (folded) resolution
+adb -s <serial> shell wm density <dpi>             # about the model's pixel density
+adb -s <serial> shell dumpsys window | grep mGlobalConfig   # check the new size in dp (w…dp h…dp)
+adb -s <serial> shell wm size reset && adb -s <serial> shell wm density reset
+```
+
+This changes the screen's size, not the fold and hinge information the app reads from the window manager, so report it as "emulated size". A real profile for the shape beats it.
+
 After each change the device may show "Swipe up to continue" or a lock screen, as a real phone does. Continue with `adb shell wm dismiss-keyguard`, then a swipe up (`adb shell input swipe <x> <y-near-bottom> <x> <y-near-top> 200`). Then check the app is still the one on screen, `adb shell dumpsys activity activities | grep topResumedActivity`, before capturing: a posture change that loses the app, or its state (text typed, the selected item, the scroll position), is a failure.
 
 ## Screenshots

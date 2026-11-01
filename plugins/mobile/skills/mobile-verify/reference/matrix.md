@@ -17,6 +17,7 @@ Run the flow end to end on each platform's first device at default settings. The
 | Android | the same phone | dark; font scale 2.0 (or the largest offered); landscape |
 | Android | a small phone profile | default |
 | Android | a foldable profile, if the app supports large screens | folded and unfolded |
+| Android | a foldable of the other shape (see "Foldables"), if the app supports large screens | folded and unfolded, real or emulated size |
 | Android | a tablet profile, if the app supports large screens | landscape |
 
 `quick` runs only the first row of each platform.
@@ -29,6 +30,8 @@ A foldable is two layouts in one device, and the change between them is a bug so
 - an open foldable usually reports a wider size class than a phone: a layout built for phones only shows as a stretched single column.
 
 When the posture can't be scripted, say so under "not checked" rather than guessing.
+
+**Foldables come in more than one shape.** Book-style foldables differ a lot between models: some open to a nearly square inner screen behind a full-size phone cover screen; others open to a landscape-shaped inner screen (wider than tall) behind a short, wide cover screen. A layout that suits one can fail the other: two panes that read well side by side on a wide inner screen become tall, narrow strips on a square one, and a short cover screen leaves little room above the keyboard. Cover each shape the app's audience uses, with a real emulator profile where one exists, else by overriding a foldable emulator's screen size and density (`reference/android.md`, "Foldables"). Name the shape in each evidence line, and mark emulated sizes as such.
 
 On the open screen, a phone layout scaled up (one stretched column, controls pinned to the far edges, a wide empty band) is a finding, not a pass, unless the project's design says the screen is meant to look that way.
 

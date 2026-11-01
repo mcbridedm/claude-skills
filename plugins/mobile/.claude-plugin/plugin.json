@@ -1,7 +1,7 @@
 {
   "name": "mobile",
   "displayName": "Mobile",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Mobile app skills: a verify step for iOS and Android changes that builds the app, drives the changed flow on throwaway simulators and emulators, captures and reads screenshots across phones, tablets, foldables, light and dark, the largest text size and landscape, and runs the platform's accessibility audit and log checks.",
   "author": {
     "name": "Devin McBride"

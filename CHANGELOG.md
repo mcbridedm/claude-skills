@@ -2,6 +2,12 @@
 
 All notable changes to this repository are recorded here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versions are per plugin, as set in each `plugin.json`, and follow [Semantic Versioning](https://semver.org/).
 
+## mobile 0.2.0 - 2026-11-01
+
+### Changed
+
+- `mobile-verify`: foldables come in more than one shape. Book-style foldables differ between models (a nearly square inner screen behind a full-size phone cover screen, or a landscape-shaped inner screen behind a short, wide cover screen), and a layout that suits one can fail the other. The default matrix gains a row for a foldable of the other shape; `reference/matrix.md` says what each shape asks of a layout and to name the shape in each evidence line; `reference/android.md` shows how to emulate a shape with no emulator profile by overriding a foldable emulator's screen size and density (`wm size`, `wm density`), checking the result in dp, and reporting it as "emulated size", since the fold and hinge information doesn't change.
+
 ## mobile 0.1.0 - 2026-11-01
 
 ### Added
