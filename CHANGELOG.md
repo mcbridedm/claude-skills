@@ -2,6 +2,20 @@
 
 All notable changes to this repository are recorded here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versions are per plugin, as set in each `plugin.json`, and follow [Semantic Versioning](https://semver.org/).
 
+## infrastructure 0.4.0 - 2026-11-01
+
+### Added
+
+- `cloud-account-setup`: plans a project's cloud organization and accounts the same way every time, or checks an existing setup against the pattern (`plan` or `check`). The pattern, in `reference/baseline.md`, has six parts:
+  - one organization per company, sharing nothing with another;
+  - a management account for billing, single sign-on and policies only, its root email a role address on the project's domain;
+  - one member account per environment in the main region;
+  - single sign-on with no personal keys, and Identity Center's home region recorded;
+  - guardrail policies (allowed regions, root denied, the audit trail protected), budgets and an organization trail;
+  - a fallback region documented, not built: what's already there, what the code must take as a variable, the steps, who decides and when to revisit.
+
+  Every plan carries a hand-over checklist, so the project can be sold or handed over. A plan is recorded for the owner's approval before the guide is written. The guide states the region at every regional step and "global" at every global one, and puts steps with a lead time first. It never creates, closes or moves accounts. AWS is the worked default; the baseline maps it to Google Cloud and Azure. Profile `.claude/cloud-account-setup.md` (`reference/profile-format.md`, with discovery and a fictional example).
+
 ## mobile 0.2.0 - 2026-11-01
 
 ### Changed
