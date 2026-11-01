@@ -2,6 +2,19 @@
 
 All notable changes to this repository are recorded here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versions are per plugin, as set in each `plugin.json`, and follow [Semantic Versioning](https://semver.org/).
 
+## mobile 0.1.0 - 2026-11-01
+
+### Added
+
+- New plugin `mobile`, for skills for iOS and Android apps.
+- `mobile-verify`: verifies a mobile change on throwaway simulators and emulators. Writes down what changed for a user, what to expect and one way it could break before building; makes or reuses only devices with its own name prefix (`device_prefix`), erases them, boots them with a ready check and sets a clean status bar; builds a debug build and installs it; per device and setting (appearance, text size, orientation, fold posture, locale) drives the flow with UI tests first (XCUITest, Espresso, Compose), then a named flow script, then deep links and direct input, and reads every screenshot against `reference/matrix.md`'s list (text, safe areas, size, dark mode, touch, state, platform fit); runs the platform's accessibility audit and checks labels and touch targets in the accessibility tree; reads the logs and crash reports. A default matrix of phones, a small phone, a tablet and a foldable, folded and open, with `quick` for one device per platform. Foldable postures with no shell command go through the profile's `fold_command`, a computer-use tool, or "not checked". Writes screenshots, logs and `report.md` to a run folder outside the repository; changes no project files, never touches physical devices or stores. Command references `reference/ios.md` (`simctl`, `xcodebuild`, `xcresulttool`; device-specific runtimes; multi-display screenshots with `--display`) and `reference/android.md` (the Android CLI for starting emulators, running apps, the layout tree and taps by text, with `adb` for settings, `emu fold`/`unfold`, per-display screenshots and logs; emulator noise told apart from the app's errors), both dry-run on Xcode 27.2 with iOS 27.2 and the Android 17 SDK, phones and foldables. Profile `.claude/mobile-verify.md` (`reference/profile-format.md`, with discovery and an example). Model-invocable, since it's cheap, starts no agents and never commits.
+
+## code-quality 0.7.2 - 2026-11-01
+
+### Changed
+
+- `finish-change`: `reference/verify-by-surface.md` has a "Mobile apps" section that points to `mobile-verify`, with a fallback when it isn't installed.
+
 ## infrastructure 0.3.0 - 2026-11-01
 
 ### Added

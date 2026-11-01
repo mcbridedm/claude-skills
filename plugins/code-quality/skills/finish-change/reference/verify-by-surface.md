@@ -35,6 +35,11 @@ Start long-running servers in the background and wait for a ready line or a heal
 
 - Write a throwaway script in a temporary folder that imports the built package the way a user would, and calls the changed function. Delete it afterwards.
 
+## Mobile apps (iOS, Android)
+
+- Use `mobile-verify` (plugin `mobile`) when it's installed: set the profile's `verify` to `/mobile:mobile-verify`. It builds the app, drives it on throwaway simulators and emulators across the device matrix, and returns evidence lines in the shape step 1 records.
+- Without it: build a debug build, install it on a simulator or emulator, drive the change (a UI test, or deep links and the shell's input commands), take a screenshot of each changed state and look at it, and read the app's log.
+
 ## Logs
 
 After driving it, search the instance's logs for `error`, `warn` and unhandled exceptions. A server error during the check fails it even if the screen looked right.
