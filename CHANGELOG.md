@@ -2,6 +2,12 @@
 
 All notable changes to this repository are recorded here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versions are per plugin, as set in each `plugin.json`, and follow [Semantic Versioning](https://semver.org/).
 
+## infrastructure 0.3.0 - 2026-11-01
+
+### Added
+
+- `ci-repro`: reproduces a failing CI or workflow job locally before any code changes. Pins the failed run and its first real error, reads the job's definition (runner, container image and flags, setup steps and versions, how the code arrives, the failing command) and lists the differences from a local replica, reproducible and not. Builds the replica in a throwaway, labelled container: the same image by digest, the same flags without the user's credentials, the failing commit's files, the same setup, no real secrets. Runs the failing step with the debug output the CI log didn't keep (a tool's debug mode, a child process's stderr), and narrows the cause one difference at a time, recording each try. When the replica passes, writes the smallest read-only diagnostic for the user to run on the real runner, ideally in a throwaway copy, never printing process command lines or environments. Tries the fix in the replica, offers to make the job keep the output that was missing, cleans up its containers. Never pushes, reruns or dispatches CI, or changes CI settings; commits nothing unless asked. Profile `.claude/ci-repro.md` (`reference/profile-format.md`, with discovery and an example). `disable-model-invocation: true`.
+
 ## code-quality 0.7.1 - 2026-10-31
 
 ### Changed

@@ -21,7 +21,7 @@
     {
       "name": "infrastructure",
       "source": "./plugins/infrastructure",
-      "description": "Infrastructure skills: a step-by-step first-apply guide for any infrastructure-as-code root, with region callouts, cross-environment checks, DNS and secret steps, and a scale-to-zero ('park') drill, if the project has one.",
+      "description": "Infrastructure skills: a step-by-step first-apply guide for any infrastructure-as-code root, with region callouts, cross-environment checks, DNS and secret steps, and a scale-to-zero ('park') drill, if the project has one; and a local reproduction of a failing CI or workflow job, in a throwaway replica of its environment, before anyone changes code on a guess.",
       "category": "development"
     },
     {
