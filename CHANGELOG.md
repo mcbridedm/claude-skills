@@ -2,6 +2,12 @@
 
 All notable changes to this repository are recorded here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versions are per plugin, as set in each `plugin.json`, and follow [Semantic Versioning](https://semver.org/).
 
+## code-quality 0.7.1 - 2026-10-31
+
+### Changed
+
+- `commit-range-review`: `context.md` and the report name paths relative to the repository root. Both are committed, and an absolute path carries the user's home folder (often their name) and is wrong on any other machine. Absolute paths stay in the reviewers' briefs, which aren't committed.
+
 ## ui 0.1.0 - 2026-10-30
 
 ### Added

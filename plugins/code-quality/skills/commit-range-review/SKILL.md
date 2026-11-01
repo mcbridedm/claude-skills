@@ -75,7 +75,7 @@ Build a short context file for the reviewers, at `<report_dir>/<run>/context.md`
    - the checkout reviewers read (the repository, or the worktree);
    - the profile's `focus`, if any.
 
-   Keep it to facts; no opinions.
+   Keep it to facts; no opinions. **Paths relative to the repository root** (`.git/commit-range-review/<run>/api.diff`, "the repository root"): `context.md` is committed with the report, and an absolute path carries the user's home folder, often their name, and is wrong on every other machine. Absolute paths go only in the reviewers' briefs, which aren't committed.
 
 ## Step 3: Review the slices in parallel
 
@@ -129,7 +129,7 @@ Run the profile's `checks` (default: the project's lint, typecheck and test comm
    - the slices and reviewers;
    - anything not reviewed and why.
 
-   Finding ids are `<run>-NN`.
+   Finding ids are `<run>-NN`. Paths in it are relative to the repository root, as in `context.md`.
 2. **Add a row to `<report_dir>/README.md`**, the index, creating it if needed: date, range, commit count, findings by severity, and a link.
 3. **Move the marker to the head SHA:** a one-line file at the profile's `marker` path (default `<report_dir>/LAST_REVIEWED`) holding the SHA. Move it only after the report is written. A failed or partial run leaves the marker where it was.
 4. **Record follow-ups** where the profile's `followups` setting says (e.g. a checklist section in a roadmap file), one line per finding the user hasn't fixed, with its id.
