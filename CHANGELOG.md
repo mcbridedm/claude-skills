@@ -2,6 +2,12 @@
 
 All notable changes to this repository are recorded here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versions are per plugin, as set in each `plugin.json`, and follow [Semantic Versioning](https://semver.org/).
 
+## infrastructure 0.4.1 - 2026-11-01
+
+### Changed
+
+- `cloud-account-setup`: the baseline says how the management account is made on AWS: "Sign up for AWS (advanced)", with its link. The newer sign-up that offers to "create a project" makes accounts with no root user, in an organization whose policies AWS manages, with no choice of region, and they can't leave that organization. The guide names the advanced link and warns against the other. It also notes that the sign-up page may refuse while other AWS sessions are open in the browser, and that a private window avoids it.
+
 ## infrastructure 0.4.0 - 2026-11-01
 
 ### Added

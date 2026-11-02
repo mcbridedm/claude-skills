@@ -1,7 +1,7 @@
 {
   "name": "infrastructure",
   "displayName": "Infrastructure",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "description": "Infrastructure skills: a cloud organization and its accounts planned the same way every time (one organization per company, a billing-only management account, an account per environment, single sign-on, guardrails, a hand-over checklist and a documented fallback region), or checked against that pattern; a step-by-step first-apply guide for any infrastructure-as-code root, with region callouts, cross-environment checks, DNS and secret steps, and a scale-to-zero ('park') drill, if the project has one; and a local reproduction of a failing CI or workflow job, in a throwaway replica of its environment, before anyone changes code on a guess.",
   "author": {
     "name": "Devin McBride"

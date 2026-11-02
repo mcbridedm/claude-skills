@@ -13,6 +13,7 @@ The pattern every plan follows and every check compares against. AWS terms first
 - Root email: a role address on the project's domain that forwards (e.g. `aws@<domain>`), never a person's own mailbox, so it can be handed over.
 - Root: MFA on, the password and MFA in the company's password manager, used only for the few tasks that need root.
 - The legal name and address on the account are the company's; payment is the company's card or invoicing.
+- **How it's made (AWS):** with "Sign up for AWS (advanced)" (`https://signin.aws.amazon.com/signup?request_type=register`), which makes an account with a root user. Not "Sign up for AWS (new)", the flow that signs in with an AWS Builder ID and offers to "create a project": its project accounts have no root user, sit in an organization whose service control policies AWS manages, can't choose their region, and can't be removed from that organization, only closed ([AWS, "Compare sign-up options"](https://docs.aws.amazon.com/accounts/latest/reference/sign-up-for-aws.html#compare-sign-up-options)). The guide names the advanced link and warns against the other. If the browser already has AWS sessions, the sign-up page may refuse with "Multi-session is not supported"; a private window avoids it without changing the person's other sessions.
 
 ## Member accounts
 
