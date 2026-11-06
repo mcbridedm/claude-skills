@@ -2,6 +2,12 @@
 
 All notable changes to this repository are recorded here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versions are per plugin, as set in each `plugin.json`, and follow [Semantic Versioning](https://semver.org/).
 
+## architecture 0.6.1, code-quality 0.7.3, docs 0.6.1 - 2026-11-05
+
+### Changed
+
+- The plugins' agents set their own effort: `effort: high` on the `reviewer` agents (`architecture-review`, `design-review`, `commit-range-review`, `codebase-audit`, `docs-sync`, `writing-audit`), `effort: low` on `docs:checker` (`docs-sync`'s fix placers). Before this, a subagent ran at the session's effort, so a review started from an `xhigh` session ran every reviewer at `xhigh`. A step that needs more passes the effort with its call. The validator now refuses an agent without a valid `effort` (CONTRIBUTING, section 2).
+
 ## infrastructure 0.4.1 - 2026-11-01
 
 ### Changed

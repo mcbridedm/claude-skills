@@ -107,6 +107,11 @@ if (market) {
         fail(`${rel(apath)}: grants Bash; say so in its description`);
       if (afm.model && !agentModel(afm.model))
         fail(`${rel(apath)}: model "${afm.model}" isn't sonnet, opus, haiku, fable, inherit or a full model id`);
+      // Every agent names its effort (CONTRIBUTING, section 2): without one it inherits the
+      // session's, so a panel of reviewers started from an xhigh session all run at xhigh.
+      if (!afm.effort) fail(`${rel(apath)}: front matter has no effort (high for a reviewer, low for a checker)`);
+      else if (!["low", "medium", "high", "xhigh", "max"].includes(afm.effort))
+        fail(`${rel(apath)}: effort "${afm.effort}" isn't low, medium, high, xhigh or max`);
       // A checker does the plugin's mechanical work on a cheaper model (CONTRIBUTING, section 2):
       // it names its model, and has exactly the reviewer's read-only tools.
       if (file === "checker.md") {
