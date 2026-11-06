@@ -2,6 +2,12 @@
 
 All notable changes to this repository are recorded here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versions are per plugin, as set in each `plugin.json`, and follow [Semantic Versioning](https://semver.org/).
 
+## architecture 0.7.0 - 2026-11-06
+
+### Added
+
+- `user-panel-review`: a screenshot walk, for apps that can't be run during the review (no simulator, emulator, device, browser or local instance, or the run is told not to use one). The skill finds the latest verification screenshot set (the profile's `screenshot_folder`, or a discovered folder of dated sets), and builds an ordered walk per journey from a manifest, the flow and screen names in file names, and the design docs. Each persona walks the screenshots in order as if using the app, reading its words from the images and, where they exist, its words files and design docs. Steps no screenshot shows are marked "not shown", never guessed, and listed in a new "Not shown" section. The bad actor lists the attacks the screens invite, marked not tried, and the lead checks them in the code. Findings are still verified against the code, and against changes since the set was taken. The review opens with a mode block: that it ran from screenshots and why, the set and its commit, and which journeys were fully shown, partly shown or not shown. Surfaces that do run (an API, a CLI) are still used live. The walk runs automatically when the app can't start, or on request with the `screenshots` argument or `run_mode: screenshots`; `run_mode: run` turns it off. New profile settings, all optional with defaults: `run_mode`, `screenshot_folder` and a `## Screenshot walk` section. Screenshot walkers run as the read-only `architecture:reviewer`. Details in `reference/screenshot-walk.md`.
+
 ## architecture 0.6.1, code-quality 0.7.3, docs 0.6.1 - 2026-11-05
 
 ### Changed

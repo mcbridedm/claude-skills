@@ -1,7 +1,7 @@
 ---
 name: user-panel-review
-description: Outside-in review of the current project by a panel of simulated users - a newcomer, a regular and a bad actor trying to abuse it, plus, when the product has an API, CLI, SDK or MCP server, people who run agents and AI agents using it on their own. Each persona sees only what a real user would see (the running app, public docs, the CLI, API or MCP server), never the source code, walks real journeys and reports where they got stuck or what they got away with. The lead then checks every finding against the code. The counterpart of architecture-review, which reads the code from the inside. Personas, journeys and how to run the app come from a profile in the reviewed repo (.claude/user-panel-review.md); without one, the skill discovers defaults and offers to write a starter profile. Use when the user asks for a user panel, a usability or onboarding review, an outside-in or red-team review, or how the product feels to new users or agents.
-argument-hint: "[optional focus, e.g. 'onboarding' or 'agents' or 'abuse']"
+description: Outside-in review of the current project by a panel of simulated users - a newcomer, a regular and a bad actor trying to abuse it, plus, when the product has an API, CLI, SDK or MCP server, people who run agents and AI agents using it on their own. Each persona sees only what a real user would see (the running app, public docs, the CLI, API or MCP server), never the source code, walks real journeys and reports where they got stuck or what they got away with. When the app can't be run, they walk its latest verification screenshots instead (screenshot walk). The lead then checks every finding against the code. The counterpart of architecture-review, which reads the code from the inside. Personas, journeys and how to run the app come from a profile in the reviewed repo (.claude/user-panel-review.md); without one, the skill discovers defaults and offers to write a starter profile. Use when the user asks for a user panel, a usability or onboarding review, an outside-in or red-team review, or how the product feels to new users or agents.
+argument-hint: "[optional focus, e.g. 'onboarding' or 'agents' or 'abuse'] [screenshots]"
 disable-model-invocation: true
 ---
 
@@ -15,19 +15,23 @@ Project specifics come from the project's **profile** (Step P): what the product
 
 This review spawns one sub-agent per persona (three by default, six with the agent personas) and needs the app running, so it costs time and tokens. Run it only when the user asks. If the user gave a focus (`$ARGUMENTS`), every panelist weights it.
 
+**Screenshot walk.** When the app can't be run for this review (no simulator, emulator, device, browser or local instance, or the run is told not to use one), the panel walks the app's latest verification screenshots in journey order instead, reading its words from the images and, where they exist, its words files and design docs. Steps no screenshot shows are marked "not shown", never guessed. It runs automatically when Step 0 can't start the app, or when asked: the `screenshots` argument (the rest of the arguments are still the focus), or `run_mode: screenshots` in the profile. `run_mode: run` turns the fallback off. The whole procedure is in `${CLAUDE_SKILL_DIR}/reference/screenshot-walk.md`; read it when the mode applies.
+
 **This is a review, not a change.** Panelists may create accounts and content **only on the local or throwaway instance the profile names**, never on a shared, staging or production one, and never on a third-party service. Don't edit code. The outputs are the review artifacts (Step 5) and action items (Step 6). This skill's own files are shared by many projects: never edit them during a review.
 
 Supporting files, read them when a step points to them:
 - `${CLAUDE_SKILL_DIR}/reference/profile-format.md`: the profile's sections and defaults.
 - `${CLAUDE_SKILL_DIR}/reference/personas.md`: the default roster, and how to write a persona.
 - `${CLAUDE_SKILL_DIR}/reference/example-profile.md`: a filled-in example, also the starting point for a starter profile.
+- `${CLAUDE_SKILL_DIR}/reference/screenshot-walk.md`: the screenshot walk: finding the set, building the walk, the panelist brief's changes, the report's mode block.
 
 ## Step C: Context check (first, before anything costly)
 
 Before Step P's heavier work, and before any agent, write or command with side effects, run the check in `${CLAUDE_SKILL_DIR}/reference/context-check.md`. It decides whether this conversation is the right place to run the skill. On **fresh session** or **wait**, stop there and give the user what the check says. For this skill:
 - **Authorship (2) weighs heavily** for the steps done here: verifying findings against the code, deciding and writing the review. If this conversation built the features the panel will use, recommend a fresh session. The panelists start fresh either way.
 - **Context load (3):** every panelist's report comes back here.
-- **Moving target (5):** the app under test must not change during the run. Wait for deploys, merges and agents in flight.
+- **Moving target (5):** the app under test must not change during the run. Wait for deploys, merges and agents in flight. In a screenshot walk, also wait for a verification run that is still writing screenshots.
+- **Readiness (6):** the app's run commands and the instance, or, for a screenshot walk, a screenshot set to walk.
 
 ## Step P: Load the profile
 
@@ -40,20 +44,22 @@ Before Step P's heavier work, and before any agent, write or command with side e
    - **Bad-actor hats:** by the kind of product, from the table in `reference/personas.md` (community, commerce, SaaS or API); the prompt injector too when the agent personas are on.
    - **Journeys:** sign-up, first use, the core loop, settings, recovery, leaving; for agents, discovery, auth, the core API calls, errors and limits.
    - **Where reports go:** `docs/reviews/users/` if `docs/reviews/` exists; otherwise `reviews/users/`.
+   - **Screenshots and words, for a screenshot walk:** a folder of dated verification screenshot sets, the app's words files (string or localisation resources) and its design docs for the journeys (`reference/screenshot-walk.md`, "Finding the screenshot set").
 
    Tell the user what you found and **offer to write a starter profile**. Write it only if they agree. Either way, record the values used in the run's README under "Profile used".
 
 ## Step 0: Start the app and check the panel's view
 
 1. Note `git status --porcelain` and `git rev-parse --short HEAD`.
-2. Start the app with the profile's run commands, on the throwaway instance it names. Wait until it answers. If it won't start, stop and tell the user: a panel without the app is a doc review, not this.
+2. Start the app with the profile's run commands, on the throwaway instance it names. Wait until it answers. If it won't start, or what it needs to run (a simulator, emulator, device or browser) isn't available, or the run was told not to use one: with `run_mode: auto` (the default), switch to the screenshot walk and follow `reference/screenshot-walk.md` from "Finding the screenshot set" to "The words the app uses", then come back for steps 3 to 5 for any surface that does run. With `run_mode: run`, or if no screenshot set can be found, stop and tell the user: a panel without the app or its screenshots is a doc review, not this.
+   With the `screenshots` argument or `run_mode: screenshots`, don't start the visual app at all: go straight to the screenshot walk.
 3. Check each surface a persona needs answers (the web URL, the API, the CLI built, the MCP server starting). Note any that don't, and drop or adjust the personas that depend on them.
 4. Gather each persona's **allowed view**: the URLs, public files and commands the profile allows it, plus what's public by nature (pages, discovery files, `--help` output). Copy public documents into the run folder (`<RUN_DIR>/public/`) so panelists read exactly what users read.
 5. Read the previous user-panel reviews if there are any: their open findings are what this run re-tests first.
 
 ## Step 1: Brief and run the panel
 
-Send all panelist Agent calls **in a single message** so they run concurrently. Use a general-purpose sub-agent: panelists need a shell to use the CLI and the API, and a browser tool if one is available. Each gets this brief with its persona filled in; replace the `<...>` placeholders. Panelists don't share your conversation.
+Send all panelist Agent calls **in a single message** so they run concurrently. Use a general-purpose sub-agent: panelists need a shell to use the CLI and the API, and a browser tool if one is available. Screenshot walkers need neither: dispatch them as `architecture:reviewer` (read-only; it reads images) with the brief's changes in `reference/screenshot-walk.md`, "The panelist brief". Each gets this brief with its persona filled in; replace the `<...>` placeholders. Panelists don't share your conversation.
 
 ```
 You are <PERSONA NAME>: <PERSONA DESCRIPTION, from the profile>.
@@ -95,7 +101,7 @@ If a panelist fails or returns something off-format, re-run that one once. If it
 
 ## Step 2: Collect
 
-Save every report verbatim, in panel order, to `<RUN_DIR>/panel.md`, with a header giving the date, the commit, the focus, and any persona that failed or was dropped. Then compare `git status --porcelain` with Step 0: revert only files a panelist created or changed in the repository, and say so in the header. Stop the app if you started it.
+Save every report verbatim, in panel order, to `<RUN_DIR>/panel.md`, with a header giving the date, the commit, the focus, and any persona that failed or was dropped. In a screenshot walk the header also says the panel ran from screenshots, with the set's path, date and commit. Then compare `git status --porcelain` with Step 0: revert only files a panelist created or changed in the repository, and say so in the header. Stop the app if you started it.
 
 ## Step 3: Verify against the code
 
@@ -106,6 +112,7 @@ Now you may read the code. Panelists report symptoms; you find causes.
 - **Separate the layers:** a finding may be the product (a missing step), the words (a message that doesn't say what to do), or the docs (the answer exists but a user can't find it). Say which.
 - **Group by journey**, not by persona. One confusing step that three personas hit is one finding with three witnesses.
 - **Respect decided things:** if a finding only disagrees with a recorded decision (the profile's "Decided sources"), note it as feedback on that decision, not a defect.
+- **Screenshot walk:** also check each finding still holds if the screen changed after the set was taken, check every "not tried" attack in the code, and move anything that only exists because a step wasn't shown to "Not shown" (`reference/screenshot-walk.md`, "What changes in the review").
 
 ## Step 4: Decide
 
@@ -115,11 +122,14 @@ As the lead: which findings to act on now, which to track, which to leave. Rank 
 
 In `<RUN_DIR>` (the profile's report folder, `YYYY-MM-DD[-focus]/`):
 - `panel.md`: the reports (Step 2).
+- `walk.md`, in a screenshot walk: the journeys, their steps and the image for each.
 - `README.md`:
+  - **Mode block**, in a screenshot walk only, before the summary: that the panel ran from screenshots and why, the set, and which journeys were fully shown, partly shown and not shown (`reference/screenshot-walk.md`, "The mode block").
   - **Summary:** the run in five lines: who could do what they came for, the worst findings, what changed since the last run.
   - **Profile used** (or "the profile at `<commit>`").
   - **By journey:** each journey with its findings (CONFIRMED / PLAUSIBLE, severity, witnesses, layer, the fix).
-  - **Abuse:** each attack tried, whether it worked, and the defence that held or didn't.
+  - **Abuse:** each attack tried, whether it worked, and the defence that held or didn't. In a screenshot walk: each attack the screens invited, marked not tried, and what the code says.
+  - **Not shown**, in a screenshot walk: every step no screenshot showed, by journey, and the personas that needed it.
   - **Corrected findings.**
   - **Since the last review:** open findings re-tested, now fixed or still open.
   - **Proposed changes to the skill or profile**, if any (Step 0 or the run showed a gap).
@@ -131,4 +141,4 @@ Add each adopted finding where the profile's "Action items" says (default: only 
 
 ## Hand off
 
-Commit the review folder and action items only if the profile's `commit` setting is on (default: off; leave them for the user). Reply in chat with the summary, the top findings, any attack that worked, and the review's path. Never push unless the profile says to.
+Commit the review folder and action items only if the profile's `commit` setting is on (default: off; leave them for the user). Reply in chat with the summary, the top findings, any attack that worked, and the review's path; in a screenshot walk, lead with the mode block and the steps not shown. Never push unless the profile says to.

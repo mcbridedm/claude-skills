@@ -3,6 +3,8 @@ profile_version: 1
 project: Billfold
 report_folder: docs/reviews/users
 action_id: UP-YYYY-MM-DD-NN
+run_mode: auto
+screenshot_folder: test-results/screenshots
 commit: false
 push: false
 ---
@@ -50,6 +52,14 @@ A client who has never heard of Billfold and gets an invoice by email. Journeys:
 ## Action items
 
 `TODO.md`, under "Usability". Launch blockers under "Before launch".
+
+## Screenshot walk
+
+- Sets: one folder per run, named `YYYY-MM-DD-HHMM`, from the browser tests. Each holds `manifest.json`, which names the journey, the step and the commit for each image.
+- Words: `web/src/locales/en.json`.
+- Design docs: `docs/flows/` (one file per journey, steps in order).
+- UI paths: `web/src/`.
+- Older sets: no.
 
 ## Safety
 

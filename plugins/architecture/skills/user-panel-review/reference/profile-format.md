@@ -11,6 +11,10 @@ project: example        # the product's name, as panelists should know it
 report_folder: docs/reviews/users   # default: docs/reviews/users, or reviews/users
 index_file: docs/reviews/users/README.md   # default: <report_folder>/README.md
 action_id: UP-YYYY-MM-DD-NN         # default
+run_mode: auto          # auto (default): run the app, walk screenshots if it can't run;
+                        # run: never walk screenshots; screenshots: always walk them
+screenshot_folder: verify/screenshots   # where dated verification screenshot sets live
+                        # (default: discovered); may be outside the repository
 commit: false           # commit the review folder and action items (default false)
 push: false             # never true unless the maintainer says so
 ---
@@ -29,8 +33,9 @@ push: false             # never true unless the maintainer says so
 | `## Journeys` | Shared journeys personas can name instead of repeating them. | Discovered |
 | `## Decided sources` | Where recorded decisions live (decision records, a project file), so findings that only disagree with a decision are filed as feedback. | `docs/adr/`, `docs/decisions/` |
 | `## Action items` | Where adopted findings go, and where launch blockers go. | The review's README only |
+| `## Screenshot walk` | For the screenshot walk (`reference/screenshot-walk.md`): how file names or a manifest name the journey and screen, the words files (string or localisation resources) and design docs panelists may read, the UI paths whose commits make a set stale, and whether older sets may fill steps the newest one lacks. | Discovered; older sets not used |
 | `## Safety` | Anything panelists must never do here (an email service that really sends, a payment provider, a webhook to a real URL), and how to turn it off for the run. | None |
 
 ## Migration
 
-`profile_version: 1` is the first format.
+`profile_version: 1` is the first format. `run_mode`, `screenshot_folder` and `## Screenshot walk` were added to it with defaults (architecture 0.7.0); profiles without them need no change.
