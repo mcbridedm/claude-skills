@@ -126,7 +126,8 @@ function settingsFor(opts, work, out) {
       failIfUnavailable: true,
       allowUnsandboxedCommands: false,
       filesystem: { allowWrite: [work], denyRead: [homedir(), out] },
-      network: { allowedDomains: opts.hosts },
+      // A loopback address bypasses the proxy, so the domain list alone can't reach a local instance.
+      network: { allowedDomains: opts.hosts, ...(opts.hosts.some((host) => ["localhost", "127.0.0.1", "::1"].includes(host)) && { allowLocalBinding: true }) },
     };
   }
   return settings;

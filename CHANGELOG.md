@@ -2,6 +2,12 @@
 
 All notable changes to this repository are recorded here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versions are per plugin, as set in each `plugin.json`, and follow [Semantic Versioning](https://semver.org/).
 
+## architecture 0.8.1 - 2026-11-09
+
+### Fixed
+
+- `cold-visitor`: a `throwaway` visit can reach its local instance. A loopback address bypasses the sandbox's proxy, so the host list alone couldn't allow it. The launcher now allows local connections when a listed host is loopback, which opens every loopback port on that machine to the visitor; the live-site modes don't get it.
+
 ## architecture 0.8.0 - 2026-11-09
 
 ### Added

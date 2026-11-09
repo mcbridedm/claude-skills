@@ -23,7 +23,7 @@ A session's own Bash sandbox can't hold a headless agent. In that case the skill
 | Mode | Target | The visitor can | Enforced by |
 |---|---|---|---|
 | `read-only` (default) | The live site, signed out | Fetch pages and search | Only WebFetch (GET) and WebSearch exist; domain rules limit WebFetch to the listed hosts |
-| `throwaway` | An instance from the profile's `## Run` | Sign up, post, connect an agent | The OS sandbox: writes only to its folder, no reads of the home folder, only the listed hosts. The probe proves it |
+| `throwaway` | An instance from the profile's `## Run` | Sign up, post, connect an agent | The OS sandbox: writes only to its folder, no reads of the home folder, only the listed hosts. The probe proves it. A local target also opens every loopback port on the machine to the visitor |
 | `live-full` | The live site | The same, for real | The same, and the user must name the host for that one run. A profile can block it outright |
 
 The report is a second turn after the visit, so being asked for one can't change how the visitor behaved.
