@@ -1,8 +1,8 @@
 {
   "name": "architecture",
   "displayName": "Architecture",
-  "version": "0.7.0",
-  "description": "Architecture skills: a multi-agent architecture review from the inside, an outside-in user panel review, and a lightweight design review of one design before it's built, each adapting to any repository through a per-project profile.",
+  "version": "0.8.0",
+  "description": "Architecture skills: a multi-agent architecture review from the inside, an outside-in user panel review, a stranger's cold visit by a headless agent that knows nothing about the project, and a lightweight design review of one design before it's built, each adapting to any repository through a per-project profile.",
   "author": {
     "name": "Devin McBride"
   },

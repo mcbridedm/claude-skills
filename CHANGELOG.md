@@ -2,6 +2,12 @@
 
 All notable changes to this repository are recorded here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versions are per plugin, as set in each `plugin.json`, and follow [Semantic Versioning](https://semver.org/).
 
+## architecture 0.8.0 - 2026-11-09
+
+### Added
+
+- `cold-visitor`: a stranger's test of a site. `scripts/cold-visit.mjs` launches one headless agent from a new empty folder, with no repository, instructions, memory, MCP servers or notes from the caller, and gives it one vague prompt. It runs on the signed-in Claude subscription and is bound by time, not money. A probe on a cheap model runs first and stops the run if a canary word from the profile appears in what the agent says it knows; in a mode with a shell, the probe also proves the OS sandbox holds. The report is a separate second turn, so being asked for one can't change how the visitor behaved. Three modes: `read-only` against the live site, by default (only WebFetch and WebSearch exist, and WebFetch is limited to the listed hosts), `throwaway` for full engagement on a throwaway instance, and `live-full`, which the user must name for a single run and a profile can block. Inside a session's Bash sandbox, the skill hands over the line to run. The lead checks each finding against the code and the site, and sorts it into new defect, known and tracked, or expected. Profile `.claude/cold-visitor.md` (`reference/profile-format.md`, with discovery and a fictional example).
+
 ## architecture 0.7.0 - 2026-11-06
 
 ### Added
