@@ -2,6 +2,12 @@
 
 All notable changes to this repository are recorded here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versions are per plugin, as set in each `plugin.json`, and follow [Semantic Versioning](https://semver.org/).
 
+## mobile 0.3.0 - 2026-11-14
+
+### Added
+
+- `os-release-check`: keeps iOS, Android, watchOS and Wear OS apps current with OS releases. `scripts/discover.mjs` (plain Node, no dependencies) reads each app's targets from its build files: compileSdk, targetSdk and minSdk per Gradle module (literals, version-catalog references, simple constants, the newer `compileSdk { version = release(…) }` form), Wear OS, TV and Automotive modules apart, AGP, Gradle, Kotlin and the Compose BOM; deployment targets per platform from the Xcode project, XcodeGen's `project.yml` and `Package.swift`, the pinned Xcode and the Swift tools version. What it can't resolve it reports as the expression found, never guessed. The skill then reads, on the run's date, the newest stable and beta of each OS and toolchain (the local SDK tools, which show only what's installable, and the vendors' own pages), the behaviour changes that touch the apps, and the stores' current requirements (Google Play's target API level per form factor and its extension date; Apple's minimum Xcode and SDK for uploads), each quoted with its page and date (`reference/sources.md`). It compares them under the project's policy (defaults: betas tested within 14 days, stables adopted within 30, store deadlines urgent within 60 days, toolchains at most a minor behind) and writes a dated report with each app's actions in date order (`reference/output-format.md`). Optional device tests run the project's own test command on the newest image or runtime, only on the skill's own device (name prefix), one at a time by default, under the project's device lock if the profile names one, with `ANDROID_SERIAL` always set so Gradle never runs on a plugged-in phone (`reference/device-tests.md`). `scripts/fingerprint.mjs` is a cheap guard for a monthly headless run: a hash of the platforms the machine can see, optionally the stores' requirement lines and the project's own targets, with a `.pending` file kept only after a successful run (`reference/scheduled-use.md`; no scheduler assumed). Never changes build files, installs SDKs or uploads, unless asked for a specific change. Profile `.claude/os-release-check.md` (`reference/profile-format.md`, with discovery and a fictional example). `disable-model-invocation: true`.
+
 ## business 0.1.0 - 2026-11-14
 
 ### Added

@@ -45,7 +45,7 @@
     {
       "name": "mobile",
       "source": "./plugins/mobile",
-      "description": "Mobile app skills: a verify step for iOS and Android changes that builds the app, drives the changed flow on throwaway simulators and emulators, captures and reads screenshots across phones, tablets, foldables, light and dark, the largest text size and landscape, and runs the platform accessibility audit and log checks.",
+      "description": "Mobile app skills: a verify step for iOS and Android changes that builds the app, drives the changed flow on throwaway simulators and emulators, captures and reads screenshots across phones, tablets, foldables, light and dark, the largest text size and landscape, and runs the platform accessibility audit and log checks; and an OS release check that compares each app's targets with the newest stable and beta platforms and the stores' current deadlines, and writes a dated report of what to change and by when.",
       "category": "development"
     },
     {
