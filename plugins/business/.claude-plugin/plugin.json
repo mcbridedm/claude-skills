@@ -1,0 +1,12 @@
+{
+  "name": "business",
+  "displayName": "Business",
+  "version": "0.1.0",
+  "description": "Business skills for selling software: regional pricing that recommends a local price per country for each paid product (subscriptions, one-time and in-app purchases), from a digital price index built on mainstream subscriptions, a purchasing-power cross-check, the closest competitors' local prices, each market's natural price endings, a floor and each store's rules, with every number sourced and dated. Recommends only; never changes live prices.",
+  "author": {
+    "name": "Devin McBride"
+  },
+  "repository": "https://github.com/mcbridedm/claude-skills",
+  "license": "MIT",
+  "keywords": ["business", "pricing", "regional-pricing", "ppp", "subscriptions", "in-app-purchases", "app-store", "google-play", "stripe", "localization"]
+}

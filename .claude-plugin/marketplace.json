@@ -47,6 +47,12 @@
       "source": "./plugins/mobile",
       "description": "Mobile app skills: a verify step for iOS and Android changes that builds the app, drives the changed flow on throwaway simulators and emulators, captures and reads screenshots across phones, tablets, foldables, light and dark, the largest text size and landscape, and runs the platform accessibility audit and log checks.",
       "category": "development"
+    },
+    {
+      "name": "business",
+      "source": "./plugins/business",
+      "description": "Business skills for selling software: regional pricing that recommends a local price per country for each paid product, from a digital price index built on mainstream subscriptions, a purchasing-power cross-check, the closest competitors' local prices, natural local price endings, a floor and each store's current rules, with every number sourced and dated. Recommends only; never changes live prices.",
+      "category": "development"
     }
   ]
 }

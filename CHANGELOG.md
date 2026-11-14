@@ -2,6 +2,13 @@
 
 All notable changes to this repository are recorded here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versions are per plugin, as set in each `plugin.json`, and follow [Semantic Versioning](https://semver.org/).
 
+## business 0.1.0 - 2026-11-14
+
+### Added
+
+- New plugin `business`, for skills about selling software, with a read-only `business:researcher` agent (Read, Grep, Glob, WebFetch, WebSearch; effort `medium`).
+- `regional-pricing`: recommends a local price per country for each paid product (monthly and yearly subscriptions, one-time or lifetime purchases, in-app purchases), so no country is priced by a store's exchange-rate conversion and no price looks cheap. One researcher per region, in parallel, collects the anchors (Spotify Premium Individual, Apple Music, YouTube Premium and Netflix's cheapest ad-free plan by default; official country pages first, aggregators flagged), the closest competitors' local prices per store, and the World Bank's price level ratio. The lead spot-checks their numbers, then per country: the index (the median of local ÷ base-country anchor prices at one day's exchange rates), a purchasing-power cross-check, the target (base price × index) rounded to the market's natural ending at or just below it (`reference/price-endings.md`, verified each run), a floor (one third of the base by default), the base market's ratios between products, and a value check (share of local Spotify and of the competitor). Store rules are checked fresh every run (`reference/store-rules.md`: price limits and grids, tax, countries where paid products can't be sold, templates or automatic local pricing, price-rise notice and consent). Countries are grouped into tiers; every country sold in gets its own price. Writes a dated table with every number's source and date, blanks where nothing was found, how sure it is, whether the base prices look right, and the judgement calls (`reference/output-format.md`). `review` mode changes a price only when the recommendation moved a full price step; reviews every 6 months, or 3 for high-inflation countries or a currency move over 15%. Never enters or changes a live price. Profile `.claude/regional-pricing.md` (`reference/profile-format.md`, with discovery and a fictional example; method and worked example in `reference/method.md`). `disable-model-invocation: true`.
+
 ## architecture 0.8.1 - 2026-11-09
 
 ### Fixed
