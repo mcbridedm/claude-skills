@@ -74,7 +74,7 @@ A failing test on a new OS is a finding for the report, not a reason to change c
 
 ## Step 6: Write the report
 
-Write the report in the shape of `reference/output-format.md` to the profile's `output` (default `docs/platform/os-release-check-<date>.md`): the summary line, the store deadlines table, each app's actions with dates, what's new since the last report, the test results, and every source with its date. Keep previous reports; each run is a new dated file. A value you couldn't source is blank with what you tried.
+Write the report in the shape of `reference/output-format.md` to the profile's `output` (default `docs/platform/os-release-check-<date>.md`): the summary line, the store deadlines table, each app's actions with dates, what's new since the last report, the test results, and every source with its date. Keep previous reports; each run is a new dated file (a second run on the same day adds `-2`, `-3`, … to the name, never overwrites). A value you couldn't source is blank with what you tried.
 
 ## Step 7: Notify (only if the profile says how)
 
