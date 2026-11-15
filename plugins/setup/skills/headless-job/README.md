@@ -9,6 +9,8 @@ Turns a recurring Claude Code task into a job that runs on its own schedule, out
 2. **Writes the job**: `prompt.md`, the `tools` it may use (everything else is refused), a `guard`, a `model` and a spend cap, and a launchd (macOS) or systemd (Linux) schedule.
 3. **Hands you the install command.** It never installs schedules itself.
 
+**Not for** ongoing work you hand out and follow (builds, reviews, fixes): use `boss-workers`, where a boss session starts workers as the work needs them.
+
 ## Invoke
 
 ```

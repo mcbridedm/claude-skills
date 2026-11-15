@@ -15,6 +15,7 @@ Every profile is optional: a skill without one discovers defaults and offers a s
 | `setup` | `project-setup` | none | | |
 | `setup` | `practice-watch` | `~/.claude/practice-watch.md` (or `.claude/practice-watch.md`) | The sources to watch, where the record and reports live, your setup files, where adopted practices go and how they're pushed, your "not for me" list | A record of every item seen and a report per run, in the repository the profile names |
 | `setup` | `headless-job` | none (the jobs folder holds each job's files) | | Logs in `~/Library/Logs/claude-jobs/` or `~/.local/state/claude-jobs/` |
+| `setup` | `boss-workers` | `.claude/boss-workers.md` | The boss's model and fallback, the accounts and their config folders, the model for each kind of work, what reaches the person, the project's worker rules, the reserve and the project's share of each account | The launchers, the operating rules doc, and the boss's own state file; each worker's log in `<folder>/.claude-runs/` |
 
 ## When each one is started
 

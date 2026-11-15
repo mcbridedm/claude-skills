@@ -5,7 +5,7 @@ Sets up a project so one boss session on the strongest model is the only session
 - **Invoke:** `/setup:boss-workers [setup | check]` when installed as a plugin, or `/boss-workers` when copied into a skills folder.
 - **Produces:** a boss launcher and a worker launcher (with `--model` and `--account`), the operating rules both follow, a section in CLAUDE.md or AGENTS.md, a profile, and, with you, a second account's config folder. The boss writes its own state file on its first start.
 - **Cost:** low. One session, no sub-agents, and one throwaway worker run per account on the cheapest model.
-- **When to run it:** once per project, when you want to stop answering several sessions and talk to one; again with `check` after adding an account or changing launchers. Not for a single long task: one session is simpler.
+- **When to run it:** once per project, when you want to stop answering several sessions and talk to one; again with `check` after adding an account or changing launchers. Not for a single long task: one session is simpler. Not for a task that repeats on a schedule: `headless-job` runs that without any session.
 
 ## How it works
 

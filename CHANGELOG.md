@@ -2,6 +2,14 @@
 
 All notable changes to this repository are recorded here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versions are per plugin, as set in each `plugin.json`, and follow [Semantic Versioning](https://semver.org/).
 
+## setup 0.4.1 - 2026-11-15
+
+### Fixed
+
+- `boss-workers` is in `project-setup`'s list of skills and profiles, so `project-setup` offers its starter profile.
+- `boss-workers` and `headless-job` each say when to use the other: a task on a schedule is a headless job; ongoing work handed out and followed is the boss's.
+- The README's rules of thumb cover cheaper models for whole sessions (`boss-workers`), beside cheaper models for sub-agents.
+
 ## setup 0.4.0 - 2026-11-15
 
 ### Added
