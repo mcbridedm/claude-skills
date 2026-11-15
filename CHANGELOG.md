@@ -2,6 +2,21 @@
 
 All notable changes to this repository are recorded here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versions are per plugin, as set in each `plugin.json`, and follow [Semantic Versioning](https://semver.org/).
 
+## setup 0.6.0 - 2026-11-15
+
+One copy of the rules, after two projects' copies needed the same fixes by hand.
+
+### Changed
+
+- `boss-workers`: the operating rules stay in the skill. The boss launcher finds the installed `operating-rules.md` and the boss reads it at every start; the project's rules doc holds only the project's own rules. `check` reports a full copy in a project, and setup cuts it down. **To migrate:** run `/setup:boss-workers check`, move any general line the skill lacks into the skill, cut the project's rules doc to a pointer and its own lines, and copy the boss launcher's new rules lookup and opening prompt from the template.
+- `boss-workers`: the operating rules read the model table, accounts, escalation list, reserve and share from the profile, with no placeholders to fill in.
+
+### Added
+
+- `boss-workers`: "Keeping the rules the same across projects". A boss that learns something about this way of working changes the skill, updates its installed copy and tells the other bosses the new version; a boss records the rules' version in its state and catches up when it differs.
+- `boss-workers`: messages don't cross accounts. A session lists and messages only sessions on its own account, so a worker on another account leaves its question in its handoff, and a boss on another account is reached through a relay: a one-shot headless session on that account that sends the message.
+- `boss-workers`: check what a model name resolves to. An alias can run an older model than the docs say; where it does, the profile and launcher name the model by its full ID. `CLAUDE_CODE_SUBAGENT_MODEL` stays unset unless every reviewer agent names its model.
+
 ## setup 0.5.0 - 2026-11-15
 
 From the skill's first real run in a project.

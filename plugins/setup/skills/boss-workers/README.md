@@ -3,7 +3,7 @@
 Sets up a project so one boss session on the strongest model is the only session you talk to, and it dispatches the work to headless workers on cheaper models, across one or more subscription accounts.
 
 - **Invoke:** `/setup:boss-workers [setup | check]` when installed as a plugin, or `/boss-workers` when copied into a skills folder.
-- **Produces:** a boss launcher and a worker launcher (with `--model` and `--account`), the operating rules both follow, a section in CLAUDE.md or AGENTS.md, a profile, and, with you, a second account's config folder. The boss writes its own state file on its first start.
+- **Produces:** a boss launcher and a worker launcher (with `--model` and `--account`), a short rules doc for the project's own rules, a section in CLAUDE.md or AGENTS.md, a profile, and, with you, a second account's config folder. The boss writes its own state file on its first start.
 - **Cost:** low. One session, no sub-agents, and one throwaway worker run per account on the cheapest model.
 - **When to run it:** once per project, when you want to stop answering several sessions and talk to one; again with `check` after adding an account or changing launchers. Not for a single long task: one session is simpler. Not for a task that repeats on a schedule: `headless-job` runs that without any session.
 
@@ -21,6 +21,10 @@ Workers never ask you anything. A worker that can't settle a question writes it 
 Before starting a worker, the boss reads each account's limits (`claude -p "/usage"`) and picks one with room. Paid extras such as usage credits stay off, so a limit stops work instead of spending money.
 
 Using more than one account is your decision, under your plan's terms; the skill says what the terms it can read say, and follows your choice.
+
+## One copy of the rules
+
+The operating rules ([reference/operating-rules.md](reference/operating-rules.md)) stay in the skill. Every project's boss reads them from the installed skill at each start, so two projects can't drift apart. A boss that learns something about this way of working changes the skill, updates its installed copy and tells the other bosses the new version; a project's own rules stay in its profile and rules doc.
 
 ## Context check
 
