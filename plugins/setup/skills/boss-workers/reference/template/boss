@@ -1,0 +1,29 @@
+#!/bin/bash
+# Start the boss: the one interactive session the person talks to, at the project root.
+# It opens by reading its rules and its state, and picks up from there.
+#
+#   boss                    on the first account
+#   boss --account <name>   on another account
+#
+# Moving the boss to another account: tell it to update its state and end, then start it again
+# with the other --account. Its state is in files, so nothing is lost.
+set -u
+root="$(cd "$(dirname "$0")/.." && pwd)"
+accounts="@ACCOUNTS@"
+account="${accounts%%=*}"
+[ "${1:-}" = "--account" ] && { account="${2:-}"; shift 2; }
+config=""; found=""
+for pair in $accounts; do
+  if [ "${pair%%=*}" = "$account" ]; then found=1; config="${pair#*=}"; fi
+done
+[ -n "$found" ] || { echo "unknown account: $account (have: $accounts)"; exit 2; }
+config="${config/#\~/$HOME}"
+if [ -n "$config" ]; then
+  [ -d "$config" ] || { echo "account $account isn't set up: $config is missing"; exit 2; }
+  export CLAUDE_CONFIG_DIR="$config"
+else
+  unset CLAUDE_CONFIG_DIR
+fi
+cd "$root" || exit 1
+
+claude --model @BOSS_MODEL@ "You are the boss, running on account $account. Read @RULES_DOC@ and .claude/boss-workers.md, then @STATE_FILE@. If @STATE_FILE@ doesn't exist yet, this is the first start: build it from the project's handoffs and state files, in the shape of the rules doc's \"The boss's state\" section, then commit it. Then read each account's limits with claude -p \"/usage\" (a non-default account with CLAUDE_CONFIG_DIR set), list the sessions still running with ListAgents, and tell me in a few lines what's running, what's next and what you need from me."

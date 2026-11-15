@@ -1,0 +1,65 @@
+#!/bin/bash
+# Start one headless worker session for the boss, in one folder, logging to <folder>/.claude-runs/.
+# Refuses if a worker started there still runs: two sessions in one working tree collide.
+#
+#   run-worker [--model <alias>] [--account <name>] <folder> <run name> "<brief>"
+#   run-worker [--model <alias>] [--account <name>] <folder> <run name> -f <brief file>
+#
+# <folder> is relative to @WORKER_ROOT@ ("." is the project root). Without --model, the
+# account's default model; without --account, the first account. Run it in the background;
+# it prints the log's tail when the worker ends.
+set -u
+root="$(cd "$(dirname "$0")/.." && pwd)"
+profile="$root/.claude/boss-workers.md"
+# name=config folder, one per account; empty means the default (~/.claude).
+accounts="@ACCOUNTS@"
+
+model=""; account=""
+while [ $# -gt 0 ]; do
+  case "$1" in
+    --model) model="$2"; shift 2 ;;
+    --account) account="$2"; shift 2 ;;
+    *) break ;;
+  esac
+done
+[ $# -ge 3 ] || { sed -n '2,10p' "$0"; exit 2; }
+[ -n "$account" ] || account="${accounts%%=*}"
+config=""; found=""
+for pair in $accounts; do
+  if [ "${pair%%=*}" = "$account" ]; then found=1; config="${pair#*=}"; fi
+done
+[ -n "$found" ] || { echo "unknown account: $account (have: $accounts)"; exit 2; }
+config="${config/#\~/$HOME}"
+if [ -n "$config" ] && [ ! -d "$config" ]; then echo "account $account isn't set up: $config is missing"; exit 2; fi
+
+folder="$1"; name="$2"; shift 2
+if [ "$1" = "-f" ]; then brief="$(cat "$2")"; else brief="$1"; fi
+dir="$root/@WORKER_ROOT@/$folder"
+[ -d "$dir" ] || { echo "no folder: $dir"; exit 2; }
+mkdir -p "$dir/.claude-runs"
+lock="$dir/.claude-runs/.running"
+if [ -f "$lock" ] && kill -0 "$(cat "$lock")" 2>/dev/null; then echo "a worker is still running in $dir (pid $(cat "$lock")); not starting $name"; exit 1; fi
+
+# The project's own rules: the profile's "## Worker rules" section, up to the next heading.
+project_rules="$(awk '/^## Worker rules/{on=1; next} /^## /{on=0} on' "$profile" 2>/dev/null)"
+
+rules="RULES FOR THIS RUN: you are a headless worker for the boss session (see @RULES_DOC@). Your session ends the moment you end a turn, so never end a turn while any agent, background command or review you started is still running; wait for each one, and run sub-agents in the foreground. Never ask the person anything: where a skill says ask the user, decide from the project's own rules and decision records, record the decision there, and carry on. A question you cannot settle goes to the boss: write it in your handoff under \"Questions for the boss\", send the boss one message with SendMessage (find it with ListAgents: the session at $root) naming the folder ($folder), this run ($name) and the question, then set that part aside and carry on with the rest of the brief; an answer may arrive as a message while you work. Stop early only when everything left depends on the answer. Send no other messages. Commit in small green steps, and at least every 30 minutes: a usage limit can stop you without warning. Never print credentials. Never turn on usage credits or any paid extra. Before stopping, update your handoff, commit it, then end with a short plain summary.
+$project_rules"
+
+args=(--permission-mode bypassPermissions --settings '{"crossSessionInbound":"accept"}')
+[ -n "$model" ] && args+=(--model "$model")
+[ -n "$config" ] && export CLAUDE_CONFIG_DIR="$config"
+
+log="$dir/.claude-runs/$name-$(date +%Y%m%d-%H%M).log"
+cd "$dir" || exit 1
+claude -p "$brief
+
+$rules" "${args[@]}" > "$log" 2>&1 &
+pid=$!
+echo $pid > "$lock"
+wait $pid
+rc=$?
+rm -f "$lock"
+echo "== $name (account $account${model:+, $model}) exit $rc log $log"
+tail -c 4000 "$log"
+exit $rc
