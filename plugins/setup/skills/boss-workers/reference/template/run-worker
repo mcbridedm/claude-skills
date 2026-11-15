@@ -5,11 +5,11 @@
 #   run-worker [--model <alias>] [--account <name>] <folder> <run name> "<brief>"
 #   run-worker [--model <alias>] [--account <name>] <folder> <run name> -f <brief file>
 #
-# <folder> is relative to @WORKER_ROOT@ ("." is the project root). Without --model, the
+# <folder> is relative to @WORKER_ROOT@, and is never the project root itself (the boss works there). Without --model, the
 # account's default model; without --account, the first account. Run it in the background;
 # it prints the log's tail when the worker ends.
 set -u
-root="$(cd "$(dirname "$0")/.." && pwd)"
+root="$(git -C "$(dirname "$0")" rev-parse --show-toplevel)" || exit 1
 profile="$root/.claude/boss-workers.md"
 # name=config folder, one per account; empty means the default (~/.claude).
 accounts="@ACCOUNTS@"
@@ -36,6 +36,8 @@ folder="$1"; name="$2"; shift 2
 if [ "$1" = "-f" ]; then brief="$(cat "$2")"; else brief="$1"; fi
 dir="$root/@WORKER_ROOT@/$folder"
 [ -d "$dir" ] || { echo "no folder: $dir"; exit 2; }
+dir="$(cd "$dir" && pwd)"
+[ "$dir" != "$root" ] || { echo "not in the project root: the boss works there; use a sub-folder or a worktree"; exit 2; }
 mkdir -p "$dir/.claude-runs"
 lock="$dir/.claude-runs/.running"
 if [ -f "$lock" ] && kill -0 "$(cat "$lock")" 2>/dev/null; then echo "a worker is still running in $dir (pid $(cat "$lock")); not starting $name"; exit 1; fi

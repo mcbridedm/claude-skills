@@ -2,6 +2,19 @@
 
 All notable changes to this repository are recorded here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versions are per plugin, as set in each `plugin.json`, and follow [Semantic Versioning](https://semver.org/).
 
+## setup 0.5.0 - 2026-11-15
+
+From the skill's first real run in a project.
+
+### Added
+
+- `boss-workers`: a sandbox check. With Claude Code's sandbox on, workers started from the boss's shell run inside its sandbox, so they can lose `git worktree add` into denied paths, `gh`, package installs and claude.ai connectors. The skill says what workers lose, recommends standing worktrees the person makes once and leaves blocked steps to the boss's sandbox-excluded commands or the person, and never changes the sandbox itself.
+- `boss-workers`: registration. The new scripts, the state file and a `.claude-runs/` ignore line go wherever the project registers such things (lint lists, build inputs, generated ignore lists, a handoff hook's file list), and the project's gate runs before the commit.
+
+### Changed
+
+- `boss-workers`: the worker launcher refuses the project root, where the boss works (state commits, merges); workers use sub-folders or worktrees. Both launchers find the root with `git rev-parse --show-toplevel`, so they work at any depth (e.g. a folder per tool). The setup commit is pushed alone: if other commits wait on the branch, the skill gives the person the command to push it by hash.
+
 ## setup 0.4.1 - 2026-11-15
 
 ### Fixed

@@ -10,9 +10,9 @@ Location: `.claude/boss-workers.md` in the project. Markdown with YAML front mat
 | `boss_model` | The boss's model alias. | `fable` |
 | `boss_fallback` | The boss's model when its own cap is near. | `opus` |
 | `accounts` | A list of `{ name, config_dir, role }`. `config_dir: default` is `~/.claude`. The first is the boss's account. | one account, `main`, `default` |
-| `boss` | The boss launcher's path. | `tools/boss` |
+| `boss` | The boss launcher's path, at any depth (e.g. `tools/boss/boss` in a folder-per-tool layout). | `tools/boss` |
 | `worker` | The worker launcher's path. | `tools/run-worker` |
-| `worker_root` | Where worker folders are, relative to the root (`.` for the root itself). | `.` |
+| `worker_root` | Where worker folders are, relative to the root. Workers never run in the root itself; with `.`, each worker folder is a sub-folder or a worktree inside it. | `.` |
 | `state_file` | The boss's state. | `docs/boss-state.md` |
 | `rules_doc` | Where the operating rules are copied. | `docs/boss-workers.md` |
 | `reserve` | The share of the latest-resetting account's week the boss keeps for the person and anything urgent. | `15%` |

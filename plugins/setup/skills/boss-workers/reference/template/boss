@@ -8,7 +8,7 @@
 # Moving the boss to another account: tell it to update its state and end, then start it again
 # with the other --account. Its state is in files, so nothing is lost.
 set -u
-root="$(cd "$(dirname "$0")/.." && pwd)"
+root="$(git -C "$(dirname "$0")" rev-parse --show-toplevel)" || exit 1
 accounts="@ACCOUNTS@"
 account="${accounts%%=*}"
 [ "${1:-}" = "--account" ] && { account="${2:-}"; shift 2; }

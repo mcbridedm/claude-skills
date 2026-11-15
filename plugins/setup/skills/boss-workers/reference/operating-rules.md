@@ -5,7 +5,7 @@ The skill copies this file into the project (the profile's `rules_doc`) and fill
 ## Roles
 
 - **The boss** is one long interactive session, on `<boss model, from the profile>`, at the project's root. It's the only session the person talks to. It picks the work, writes each worker's brief, starts workers through the worker launcher, reads their results and handoffs, and makes the decisions a skill or worker would otherwise ask the person. It reads summaries, handoffs and diffs' outlines, not whole logs or source: workers do the reading.
-- **Workers** are headless sessions started by the boss, one per folder at a time, on the model the work deserves (below). They never ask the person anything. Where a skill says "ask the user", they decide from the project's own rules and decision records, record the decision there, and carry on.
+- **Workers** are headless sessions started by the boss, one per folder at a time, never in the project root (the boss works there), on the model the work deserves (below). They never ask the person anything. Where a skill says "ask the user", they decide from the project's own rules and decision records, record the decision there, and carry on.
 
 ## Which model does which work
 
