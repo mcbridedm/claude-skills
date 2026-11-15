@@ -15,7 +15,8 @@ Location: `.claude/boss-workers.md` in the project. Markdown with YAML front mat
 | `worker_root` | Where worker folders are, relative to the root (`.` for the root itself). | `.` |
 | `state_file` | The boss's state. | `docs/boss-state.md` |
 | `rules_doc` | Where the operating rules are copied. | `docs/boss-workers.md` |
-| `reserve` | The share of each week the boss keeps for the last days. | `15%` |
+| `reserve` | The share of the latest-resetting account's week the boss keeps for the person and anything urgent. | `15%` |
+| `share` | This project's share of each account's week, when other projects use the same accounts. | `100%` |
 | `commit` | Commit the setup. | `true` |
 | `push` | Push the setup commit. | `false` |
 
@@ -51,6 +52,7 @@ worker_root: services
 state_file: docs/boss-state.md
 rules_doc: docs/boss-workers.md
 reserve: 15%
+share: 50%
 push: true
 ---
 

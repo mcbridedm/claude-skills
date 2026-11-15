@@ -30,7 +30,9 @@ Only from the boss, and only: <from the profile: the escalation list, e.g. spend
 
 <from the profile: each account, its config folder and its role>
 
-- Before starting a worker, the boss reads each account's limits with `claude -p "/usage"` (a non-default account with `CLAUDE_CONFIG_DIR` set) and picks one with room, keeping `<reserve, from the profile>` of each week for the last days.
+- Before starting a worker, the boss reads each account's limits and reset times with `claude -p "/usage"` (a non-default account with `CLAUDE_CONFIG_DIR` set) and records them in its state.
+- **Earliest reset first.** Allowance left at a reset is lost, so work goes to the account whose week resets soonest, while it has room. In the last day before an account's reset, its leftover goes to batch work that can run then (reviews, audits, docs). The reserve (`<reserve, from the profile>`) is kept only on the account that resets last, for the person's own questions and anything urgent.
+- **Shares.** When several projects use the same accounts, this project keeps to `<share, from the profile>` of each account's week, counting from its reset.
 - A worker stopped by a limit is restarted on another account from its handoff.
 - If the boss's own model nears its cap, the boss carries on as the next model down until the reset.
 - Paid extras (usage credits, extra usage) stay off. No session turns them on.
