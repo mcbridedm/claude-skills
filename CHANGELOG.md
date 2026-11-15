@@ -2,6 +2,14 @@
 
 All notable changes to this repository are recorded here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versions are per plugin, as set in each `plugin.json`, and follow [Semantic Versioning](https://semver.org/).
 
+## setup 0.6.2 - 2026-11-15
+
+### Changed
+
+- `boss-workers`: the boss launcher has no default account where the profile lists several. Started without `--account`, it lists them and asks; without a terminal it prints its usage and stops. A bare start used to land on the first account listed, which is the wrong one once the boss has moved. With one account it starts as before.
+
+**To update a project:** copy the account question from the boss launcher template (the lines between `accounts=` and the loop that finds the config folder).
+
 ## setup 0.6.1 - 2026-11-15
 
 From a second project's first day with workers under a sandbox.

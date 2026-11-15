@@ -2,16 +2,31 @@
 # Start the boss: the one interactive session the person talks to, at the project root.
 # It opens by reading its rules and its state, and picks up from there.
 #
-#   boss                    on the first account
-#   boss --account <name>   on another account
+#   boss                    asks which account, where there are several (no default: a bare
+#                           start would otherwise land on whichever account is listed first)
+#   boss --account <name>   on that account
 #
 # Moving the boss to another account: tell it to update its state and end, then start it again
 # with the other --account. Its state is in files, so nothing is lost.
 set -u
 root="$(git -C "$(dirname "$0")" rev-parse --show-toplevel)" || exit 1
 accounts="@ACCOUNTS@"
-account="${accounts%%=*}"
+account=""
 [ "${1:-}" = "--account" ] && { account="${2:-}"; shift 2; }
+if [ -z "$account" ]; then
+  case "$accounts" in
+    *" "*)
+      # Asking needs a terminal; without one, show the usage and stop.
+      [ -t 0 ] || { sed -n '2,10p' "$0"; echo "accounts: $accounts"; exit 2; }
+      echo "Which account does the boss run on?"
+      for pair in $accounts; do
+        dir="${pair#*=}"; echo "  ${pair%%=*}  ${dir:-the default config folder}"
+      done
+      read -r -p "Account: " account
+      ;;
+    *) account="${accounts%%=*}" ;;
+  esac
+fi
 config=""; found=""
 for pair in $accounts; do
   if [ "${pair%%=*}" = "$account" ]; then found=1; config="${pair#*=}"; fi
