@@ -17,16 +17,18 @@ Unclear work starts on the cheaper worker model, and moves up when a worker fail
 
 ## Questions
 
-1. A worker with a question it can't settle writes it in its handoff under "Questions for the boss". The handoff is the record.
-2. It sends the boss **one** message (SendMessage; the boss is the session at the project root in ListAgents) naming the folder, the run and the question.
+1. A worker with a question it can't settle writes it in its handoff under "Questions for the boss" and commits the handoff. **The handoff is the channel the boss relies on**: it reads every run's handoff when the run ends.
+2. Where it can, it also sends the boss **one** message (SendMessage; the boss is the session at the project root in ListAgents) naming the folder, the run and the question. If the boss isn't listed or the send fails, it carries on: the handoff already holds the question. A worker never stops, retries or waits over a failed send.
 3. It sets that part aside and carries on with the rest of its brief. It stops early only when everything left depends on the answer.
 4. The boss answers by message while the worker runs (workers start with incoming messages accepted, so the answer arrives at the worker's next step), or in the next run's brief once it has ended.
 
 Workers send no other messages. Progress goes in their handoffs.
 
-**Messages don't cross accounts.** A session sees, and can message, only sessions logged in to the same account (the same config folder): ListAgents lists no others. A worker on another account than the boss can't send step 2's message, so its question waits in its handoff, which the boss reads when the run ends. The boss gives work likely to raise questions to a worker on its own account. A sandbox can hide sessions too, even on one account: the setup's test worker checks that it can list the boss.
+**Messages don't cross accounts.** A session sees, and can message, only sessions logged in to the same account (the same config folder): ListAgents lists no others. A worker on another account than the boss can't send step 2's message, so its question waits in its handoff, which the boss reads when the run ends. The boss gives work likely to raise questions to a worker on its own account. **Nor out of a sandbox.** A session started from inside the boss's shell sandbox lists no sessions at all, on any account, unless the sandbox lets it connect to the folder where sessions keep their sockets (a `cc-socks` folder under `/tmp`, e.g. `/tmp/cc-socks`, when this was written; listing the folder isn't enough). The person allows it by adding that folder to the sandbox's `network.allowUnixSockets` in the project's settings; it's their choice, since it lets workers message any session on their account. A running boss picks the change up without a restart. The setup's test worker lists the boss to prove it.
 
-**Across accounts, a relay.** To message a session on another account, run a one-shot headless session on that account that sends it: `CLAUDE_CONFIG_DIR=<that account's folder> claude -p --model <cheapest> "Send the contents of <file> to <session name>, verbatim, with SendMessage"` (a one-shot on that account with ListAgents shows the name). A reply goes to the relay, which has ended, so the message says how to answer: by a relay the other way, or a file the sender can read.
+**A send that succeeds proves little.** ListAgents can show a stale or offline row with a similar name (a Remote Control session, say), and a send to it reports success as queued. A boss counts a message as delivered only to a session it has just seen listed as running on this machine.
+
+**Across accounts, a relay.** To message a session on another account, run a one-shot headless session on that account that sends it: `CLAUDE_CONFIG_DIR=<that account's folder> claude -p --model <cheapest> "Send the contents of <file> to <session name>, verbatim, with SendMessage"` (a one-shot on that account with ListAgents shows the name). A reply goes to the relay, which has ended, so the message says how to answer: by a relay the other way, or a file the sender can read. A boss may not be able to run a relay itself (its sandbox, or its permission checks, can refuse a one-shot on another account); it never works around that. The fallback is a file the other boss can read plus one line to the person, or the person runs the relay.
 
 ## What reaches the person
 
@@ -40,8 +42,28 @@ Each account, its config folder and its role are the profile's `accounts`.
 - **Earliest reset first.** Allowance left at a reset is lost, so work goes to the account whose week resets soonest, while it has room. In the last day before an account's reset, its leftover goes to batch work that can run then (reviews, audits, docs). The reserve (the profile's `reserve`) is kept only on the account that resets last, for the person's own questions and anything urgent.
 - **Shares.** When several projects use the same accounts, this project keeps to the profile's `share` of each account's week, counting from its reset.
 - A worker stopped by a limit is restarted on another account from its handoff.
+- **The boss checks which account a worker really ran on** when it changes launchers or accounts: the launcher's log line says what was asked for, not what ran. `/usage` before and after a run, or the worker's own report of its config folder, shows it.
 - If the boss's own model nears its cap, the boss carries on as the next model down until the reset.
 - Paid extras (usage credits, extra usage) stay off. No session turns them on.
+
+## Reading a run's result
+
+- **A run is judged by its commits and its handoff, not its exit code.** A worker that could do nothing (no shell, a refused tool) still ends with exit 0 and a polite summary. After every run the boss reads the closing summary, the commits the run added (`git -C <folder> log`), and the handoff, before it counts the work as done.
+- **The boss never changes directory into a worker's folder.** A `cd` can stay in force for the rest of the session. It uses `git -C <folder>` and absolute paths, so its own commands keep running at the root.
+
+## Skills a worker can't call
+
+A skill marked for people only (`disable-model-invocation`) refuses a worker's Skill tool. Two ways round it, both the boss's to choose in the brief:
+- Start the worker with the skill's slash command as its prompt (`/plugin:skill`), when the run is that skill and nothing else.
+- Or the brief says: don't call the Skill tool; read the skill's `SKILL.md` and the reference files it names from the installed copy (the newest version's folder, where the cache holds several) and follow them by hand. The brief answers the skill's "ask the user" points and its context check in advance.
+
+An account whose installed plugins differ from the boss's can lack the skill: the boss checks before it sends that work there.
+
+## Under a sandbox
+
+Where the boss's shell is sandboxed, a worker started from it is confined by that sandbox, and can't start one of its own inside it (on macOS every shell command of the worker's then fails, while its file tools still work). The worker launcher tests for this and, only when an outer sandbox already confines it, starts the worker with its own sandbox off, and says so. The worker is then held by the boss's sandbox alone, so that sandbox's rules are what protect the machine: the boss tells the person so once, at setup. No session turns the boss's sandbox off or widens it. A step the sandbox blocks (updating the installed plugin, making a worktree in a protected path, installing dependencies) goes to the person.
+
+**A standing worktree needs its dependencies.** A new worktree has none installed, and a sandboxed worker usually can't install them (the package manager's store is outside the paths it may write), so the project's commit gate fails there and the worker can commit nothing. Whoever makes the worktrees runs the project's install in each, and again after a lockfile change.
 
 ## The boss's state
 
@@ -55,6 +77,7 @@ Every worker's prompt ends with the launcher's rules: never end a turn while som
 
 A learning about this way of working itself (a fix, a trap, an adjustment to the launchers, models, accounts, pacing, messages or the workers' rules) belongs here, not in one project. A learning about a project (its work, its devices, its checks) stays in that project's profile or rules doc.
 
+0. **One boss decides, where the person named one.** The other bosses send it their learnings (what happened, what they changed, general or the project's own) and it makes the change; this keeps two bosses from editing the skill at once. Where the person named none, the boss that learns it makes the change.
 1. **The boss that learns it changes the skill**, in the skill's own repository, following that repository's rules: this file or the launcher templates, the plugin's version, the changelog entry. It keeps the change general: no project's names, paths, hosts, accounts or people. It commits, and pushes when the person's rules for that repository allow; otherwise it asks the person once.
 2. **It updates its own installed copy** (`claude plugin update` for the plugin) and re-reads this file. If the change touched a launcher template, it applies the same change to its project's launcher.
 3. **It tells the other bosses on the machine**, one message each (SendMessage; the sessions at other projects' roots in ListAgents): the plugin's new version and one line on what changed. A boss that isn't running needs no message: it reads the new rules at its next start. A boss on another account is told through a relay (see "Questions"), or by the person where a relay isn't possible.

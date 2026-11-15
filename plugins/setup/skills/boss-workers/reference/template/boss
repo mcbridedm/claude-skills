@@ -27,7 +27,8 @@ fi
 cd "$root" || exit 1
 
 # The general rules are read from the installed skill, never from a copy in the project.
-rules="$(ls -d "${CLAUDE_CONFIG_DIR:-$HOME/.claude}"/plugins/cache/*/setup/*/skills/boss-workers/reference/operating-rules.md "${CLAUDE_CONFIG_DIR:-$HOME/.claude}"/skills/boss-workers/reference/operating-rules.md 2>/dev/null | sort -V | tail -1)"
+cfg="${CLAUDE_CONFIG_DIR:-$HOME/.claude}"
+rules="$(for f in "$cfg"/plugins/cache/*/setup/*/skills/boss-workers/reference/operating-rules.md "$cfg"/skills/boss-workers/reference/operating-rules.md; do [ -f "$f" ] && printf '%s\n' "$f"; done | sort -V | tail -1)"
 [ -n "$rules" ] || { echo "the boss-workers skill isn't installed for account $account: its operating rules are missing"; exit 2; }
 
 claude --model @BOSS_MODEL@ "You are the boss, running on account $account. Read $rules (the general operating rules, in the installed skill; its version is in the path or the plugin.json above it), then .claude/boss-workers.md and @RULES_DOC@ (this project's own), then @STATE_FILE@. If the rules' version differs from the one in your state, follow the rules' section on keeping the rules the same across projects. If @STATE_FILE@ doesn't exist yet, this is the first start: build it from the project's handoffs and state files, in the shape of the rules doc's \"The boss's state\" section, then commit it. Then read each account's limits with claude -p \"/usage\" (a non-default account with CLAUDE_CONFIG_DIR set), list the sessions still running with ListAgents, and tell me in a few lines what's running, what's next and what you need from me."

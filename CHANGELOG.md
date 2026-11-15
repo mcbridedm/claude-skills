@@ -2,6 +2,27 @@
 
 All notable changes to this repository are recorded here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versions are per plugin, as set in each `plugin.json`, and follow [Semantic Versioning](https://semver.org/).
 
+## setup 0.6.1 - 2026-11-15
+
+From a second project's first day with workers under a sandbox.
+
+### Fixed
+
+- `boss-workers`: a worker started from a sandboxed shell had no shell at all (macOS refuses a sandbox inside a sandbox; every command failed, the run still exited 0). The worker launcher now tests for an outer sandbox and, only then, starts the worker with its own sandbox off, held by the outer one, and says so. The setup's test worker runs a command that must work and one that must fail.
+- `boss-workers`: the boss launcher's rules lookup passes shellcheck (no `ls` in a pipeline).
+- `boss-workers`: the worker launcher unsets an inherited `CLAUDE_CONFIG_DIR` for the default account. A boss on a non-default account had every default-account worker run on its own account, while the log named the other.
+
+### Changed
+
+- `boss-workers`: the handoff is the channel for a worker's question; the message to the boss is sent only where the boss is listed, and a failed send never stops a worker. The launcher's rules text says so.
+- `boss-workers`: where the person names one boss to decide the shared rules, the others send it their learnings and it changes the skill.
+
+### Added
+
+- `boss-workers`, operating rules: a run is judged by its commits and handoff, not its exit code; the boss never changes directory into a worker's folder; two ways for a worker to use a skill marked for people only; "Under a sandbox"; a session started inside a sandbox can't list or message other sessions unless the sandbox allows the sessions' socket folder; the sandbox setting that lets them (`network.allowUnixSockets`, the person's choice); a standing worktree needs its dependencies installed by the person; the boss checks which account a worker really ran on; a send that reports success proves little; a boss that can't run a relay uses a file and the person.
+
+**To update a project:** copy the worker launcher's sandbox test and rules text, and the boss launcher's rules lookup, from the templates.
+
 ## setup 0.6.0 - 2026-11-15
 
 One copy of the rules, after two projects' copies needed the same fixes by hand.
