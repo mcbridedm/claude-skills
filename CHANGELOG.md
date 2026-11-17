@@ -2,6 +2,26 @@
 
 All notable changes to this repository are recorded here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versions are per plugin, as set in each `plugin.json`, and follow [Semantic Versioning](https://semver.org/).
 
+## setup 0.6.3 - 2026-11-16
+
+From a day with five workers at once, one of them out of the boss's reach.
+
+### Changed
+
+- `boss-workers`: workers run on the boss's account while it has room, because messages don't cross accounts: a worker elsewhere can't ask the boss anything and the boss can't tell it to commit, change course or release what others wait for. Another account is the overflow, or for runs that never need a word with the boss. "Earliest reset first" now applies among the accounts the boss can reach.
+- `boss-workers`: the workers' standing rules (and the worker launcher's rules text) add two: commit before any test run or build that may take more than 10 minutes; hold a lock on something other runs wait for only for the stretch that uses it.
+- `boss-workers`: a worker messages the boss by the name its brief gives, where it gives one, since an old boss's row can still be listed.
+
+### Added
+
+- `boss-workers`: every dated entry in the boss's state takes its time from the clock in the command that writes it.
+
+### Fixed
+
+- `boss-workers`: the worker launcher ignores SIGHUP, so a worker outlives the terminal it was started from. Tested: a process started the launcher's way survives its starting session ending normally, dies when that session's terminal window or tmux pane is killed, and survives with the hang-up ignored.
+
+**To update a project:** copy the two new sentences into the worker launcher's rules text, add `trap '' HUP` near the top of the worker launcher, and move workers to the boss's account in the profile's account roles.
+
 ## setup 0.6.2 - 2026-11-15
 
 ### Changed

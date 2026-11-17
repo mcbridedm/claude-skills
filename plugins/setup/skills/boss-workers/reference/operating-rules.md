@@ -18,7 +18,7 @@ Unclear work starts on the cheaper worker model, and moves up when a worker fail
 ## Questions
 
 1. A worker with a question it can't settle writes it in its handoff under "Questions for the boss" and commits the handoff. **The handoff is the channel the boss relies on**: it reads every run's handoff when the run ends.
-2. Where it can, it also sends the boss **one** message (SendMessage; the boss is the session at the project root in ListAgents) naming the folder, the run and the question. If the boss isn't listed or the send fails, it carries on: the handoff already holds the question. A worker never stops, retries or waits over a failed send.
+2. Where it can, it also sends the boss **one** message (SendMessage; the boss is the session at the project root in ListAgents, and where the brief names the boss's session, only that name: an old boss's row can still be listed) naming the folder, the run and the question. If the boss isn't listed or the send fails, it carries on: the handoff already holds the question. A worker never stops, retries or waits over a failed send.
 3. It sets that part aside and carries on with the rest of its brief. It stops early only when everything left depends on the answer.
 4. The boss answers by message while the worker runs (workers start with incoming messages accepted, so the answer arrives at the worker's next step), or in the next run's brief once it has ended.
 
@@ -39,7 +39,8 @@ Only from the boss, and only what the profile's `## Escalate to the person` sect
 Each account, its config folder and its role are the profile's `accounts`.
 
 - Before starting a worker, the boss reads each account's limits and reset times with `claude -p "/usage"` (a non-default account with `CLAUDE_CONFIG_DIR` set) and records them in its state.
-- **Earliest reset first.** Allowance left at a reset is lost, so work goes to the account whose week resets soonest, while it has room. In the last day before an account's reset, its leftover goes to batch work that can run then (reviews, audits, docs). The reserve (the profile's `reserve`) is kept only on the account that resets last, for the person's own questions and anything urgent.
+- **Workers run on the boss's account, while it has room.** Messages don't cross accounts ("Questions"), so a worker on another account can't ask the boss anything, and the boss can't tell it to change course, commit, or let go of something other runs are waiting for. Another account is the overflow: for when the boss's account nears its limit, and for runs that never need a word with the boss (a batch review, a translation batch); such a run's brief says the boss can't be reached. If the boss's account runs short for long, the boss moves to the other account and the workers follow.
+- **Earliest reset first, among accounts the boss can reach.** Allowance left at a reset is lost, so where a choice remains, work goes to the account whose week resets soonest, while it has room. In the last day before an account's reset, its leftover goes to batch work that can run then (reviews, audits, docs). The reserve (the profile's `reserve`) is kept only on the account that resets last, for the person's own questions and anything urgent.
 - **Shares.** When several projects use the same accounts, this project keeps to the profile's `share` of each account's week, counting from its reset.
 - A worker stopped by a limit is restarted on another account from its handoff.
 - **The boss checks which account a worker really ran on** when it changes launchers or accounts: the launcher's log line says what was asked for, not what ran. `/usage` before and after a run, or the worker's own report of its config folder, shows it.
@@ -67,11 +68,11 @@ Where the boss's shell is sandboxed, a worker started from it is confined by tha
 
 ## The boss's state
 
-The profile's `state_file`: what's running (folder, run, account, model, started), what's queued, what waits on the person, each account's usage at the last check, the questions open between boss and workers, and the version of these rules it last read. The boss reads it at every start and after every compaction, and updates it whenever a worker starts or ends, so a restart costs nothing.
+The profile's `state_file`: what's running (folder, run, account, model, started), what's queued, what waits on the person, each account's usage at the last check, the questions open between boss and workers, and the version of these rules it last read. The boss reads it at every start and after every compaction, and updates it whenever a worker starts or ends, so a restart costs nothing. Every dated entry takes its time from the clock, in the command that writes it (`date`), never from the boss's sense of the time: a long session's guess drifts, and a wrong time in the record misleads the next reader.
 
 ## Workers' standing rules
 
-Every worker's prompt ends with the launcher's rules: never end a turn while something it started still runs (a headless session ends with its turn); commit in small green steps and at least every 30 minutes (a limit can stop it without warning); update its handoff before stopping; the questions rule above; and the project's own worker rules from the profile.
+Every worker's prompt ends with the launcher's rules: never end a turn while something it started still runs (a headless session ends with its turn); commit in small green steps, before any test run or build that may take more than 10 minutes, and at least every 30 minutes (a limit can stop it without warning, and a long run with everything uncommitted loses the most); hold a lock on something other runs wait for (a test device, a deploy slot) only for the stretch that uses it, and release it in between, never through work that doesn't need it; update its handoff before stopping; the questions rule above; and the project's own worker rules from the profile.
 
 ## Keeping the rules the same across projects
 
