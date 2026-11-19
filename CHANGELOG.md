@@ -2,6 +2,25 @@
 
 All notable changes to this repository are recorded here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versions are per plugin, as set in each `plugin.json`, and follow [Semantic Versioning](https://semver.org/).
 
+## setup 0.7.0 - 2026-11-19
+
+Accounts with names and addresses, one account per project at a time, and a safe switch.
+
+### Added
+
+- `boss-workers`: a machine file of accounts, `~/.config/boss-workers/accounts`, outside every repository and read by every project's launchers: one line per account with its name, its address and its config folder (`default` for `~/.claude`). The profile names accounts only by name. An account is always shown as its name with its address, never by a number.
+- `boss-workers`: a sign-in check in both launchers. Before anything starts, they read which address the account's folder is signed in to (`claude auth status`) and refuse when it differs from the machine file, saying which folder holds which address and that the person signs in there. `--no-sign-in-check` skips it, loudly. `boss --check-accounts` checks every account and starts nothing.
+- `boss-workers`: on macOS, the check reports a folder that holds two stored logins (a Keychain item and a credentials file), by name only, and the cure: sign out and in again there, at the machine.
+- `boss-workers`, `accounts.md`: never use `/login` in a folder to move it to the other account while sessions run there; sign in at the machine, not over SSH; the switch procedure; what doesn't move with a switch; connectors that must follow the project, not the account.
+
+### Changed
+
+- `boss-workers`: one account per project at a time. The boss launcher exports `BOSS_WORKERS_ACCOUNT`, and the worker launcher uses the boss's account by default. `run-worker --account` is a deliberate exception and prints a warning. Without either, the worker launcher stops instead of taking the first account.
+- `boss-workers`: the boss launcher's question shows each account as "name, address", and the boss's opening prompt names its account the same way. Unknown names list the known ones with their addresses.
+- `boss-workers`, operating rules: the person decides the switch; the boss tells them when the week runs low and never moves itself or its workers. Work no longer spreads across accounts by reset time; the `reserve` is the point where the boss tells the person.
+
+**To update a project:** write the machine file, drop `config_dir` from the profile's accounts, copy both launchers from the templates with `@ACCOUNTS@` set to the account names, and run `boss --check-accounts`. Launchers with the old `name=folder` pairs keep working; `profile-format.md`, "Moving from the old form", has the steps.
+
 ## setup 0.6.3 - 2026-11-16
 
 From a day with five workers at once, one of them out of the boss's reach.
