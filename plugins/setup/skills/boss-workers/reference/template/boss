@@ -2,43 +2,156 @@
 # Start the boss: the one interactive session the person talks to, at the project root.
 # It opens by reading its rules and its state, and picks up from there.
 #
-#   boss                    asks which account, where there are several (no default: a bare
-#                           start would otherwise land on whichever account is listed first)
-#   boss --account <name>   on that account
+#   boss                       asks which account, where the project has several (no default:
+#                              a bare start would otherwise land on whichever is listed first)
+#   boss --account <name>      on that account; its workers follow it
+#   boss --check-accounts      checks every account's sign-in, starts nothing
+#   boss --no-sign-in-check    starts without checking the sign-in (loud; for a broken check only)
 #
-# Moving the boss to another account: tell it to update its state and end, then start it again
-# with the other --account. Its state is in files, so nothing is lost.
+# Switching account: tell the boss to update its state and end, then start it again with the
+# other --account. Its state is in files, so nothing is lost. Never /login in a folder to switch.
 set -u
 root="$(git -C "$(dirname "$0")" rev-parse --show-toplevel)" || exit 1
-accounts="@ACCOUNTS@"
-account=""
-[ "${1:-}" = "--account" ] && { account="${2:-}"; shift 2; }
-if [ -z "$account" ]; then
-  case "$accounts" in
-    *" "*)
-      # Asking needs a terminal; without one, show the usage and stop.
-      [ -t 0 ] || { sed -n '2,10p' "$0"; echo "accounts: $accounts"; exit 2; }
-      echo "Which account does the boss run on?"
-      for pair in $accounts; do
-        dir="${pair#*=}"; echo "  ${pair%%=*}  ${dir:-the default config folder}"
-      done
-      read -r -p "Account: " account
-      ;;
-    *) account="${accounts%%=*}" ;;
+
+# --- Accounts (the same block in boss and run-worker) ---
+# The machine file names each account once, for every project on this machine, outside any repository:
+#   <name> <address> <config folder, or "default" for ~/.claude>     (# starts a comment)
+# This project's accounts, by name; empty means every account in the machine file.
+# The old form, name=folder pairs, still works; its address, if any, comes from the machine file.
+machine="${BOSS_WORKERS_ACCOUNTS:-$HOME/.config/boss-workers/accounts}"
+project_accounts="@ACCOUNTS@"
+names=(); addrs=(); dirs=()
+lower() { printf '%s' "$1" | tr '[:upper:]' '[:lower:]'; }
+folder() { local d="${1/#\~/$HOME}"; [ "$d" = default ] && d=""; [ "$d" = / ] || d="${d%/}"; printf '%s' "$d"; }
+shown() { printf '%s' "${1:-$HOME/.claude}"; }
+state() { if [ -n "$1" ]; then printf "signed in to %s" "$1"; else printf "not signed in"; fi; }
+machine_entries() { [ -f "$machine" ] && awk '{ sub(/#.*/, "") } NF == 3 { print $1, $2, $3 }' "$machine"; }
+load_accounts() {
+  local bad dup list entry name found addr dir old
+  if [ -f "$machine" ]; then
+    bad="$(awk '{ sub(/#.*/, "") } NF && NF != 3 { print "  line " NR ": " $0 }' "$machine")"
+    [ -z "$bad" ] || { echo "$machine: each line needs three fields, <name> <address> <folder>:"; echo "$bad"; exit 2; }
+    dup="$(machine_entries | awk '{ print $1 }' | sort | uniq -d)"
+    [ -z "$dup" ] || { echo "$machine names an account twice: $dup"; exit 2; }
+  fi
+  list="$project_accounts"
+  [ -n "$list" ] || list="$(machine_entries | awk '{ print $1 }')"
+  for entry in $list; do
+    name="${entry%%=*}"
+    found="$(machine_entries | awk -v n="$name" '$1 == n { print $2, $3 }')"
+    addr="${found%% *}"; dir="$(folder "${found#* }")"
+    if [ "$entry" != "$name" ]; then
+      old="$(folder "${entry#*=}")"
+      if [ -n "$found" ] && [ "$old" != "$dir" ]; then
+        echo "account $name: the launcher says folder $(shown "$old"), $machine says $(shown "$dir"). Make them agree."; exit 2
+      fi
+      dir="$old"
+    elif [ -z "$found" ]; then
+      echo "account $name isn't in $machine. Add a line: $name <address> <folder>"; exit 2
+    fi
+    names+=("$name"); addrs+=("$addr"); dirs+=("$dir")
+  done
+  [ ${#names[@]} -gt 0 ] || { echo "no accounts. Make $machine, one line per account: <name> <address> <folder>"; exit 2; }
+}
+show_accounts() {
+  local i
+  for i in "${!names[@]}"; do
+    echo "  ${names[$i]}, ${addrs[$i]:-(no address: add it to $machine)}"
+  done
+}
+index_of() {
+  local i
+  for i in "${!names[@]}"; do [ "${names[$i]}" = "$1" ] && { echo "$i"; return 0; }; done
+  return 1
+}
+signed_in_as() {
+  # The address a folder is signed in to, or nothing. Reads the status only, never a credential.
+  local out
+  if [ -n "$1" ]; then out="$(CLAUDE_CONFIG_DIR="$1" claude auth status --json 2>/dev/null)"
+  else out="$(unset CLAUDE_CONFIG_DIR; claude auth status --json 2>/dev/null)"; fi
+  printf '%s\n' "$out" | grep -q '"loggedIn": *true' || return 0
+  printf '%s\n' "$out" | sed -n 's/.*"email": *"\([^"]*\)".*/\1/p' | head -1
+}
+two_logins() {
+  # macOS: a folder can hold a Keychain item and a credentials file at once. Names only, never secrets.
+  command -v security >/dev/null 2>&1 || return 0
+  local d svc="Claude Code-credentials"
+  d="$(shown "$1")"
+  [ -n "$1" ] && svc="$svc-$(printf '%s' "$1" | shasum -a 256 | cut -c1-8)"
+  if [ -f "$d/.credentials.json" ] && security find-generic-password -s "$svc" >/dev/null 2>&1; then
+    echo "!! account $2: $d holds two stored logins, the Keychain item \"$svc\" and the file .credentials.json. Which one is used isn't documented. Cure: end every session in that folder, then sign out and in again there, at the machine itself (not over SSH)." >&2
+  fi
+}
+check_signin() {
+  # Refuses to start unless account $1's folder is signed in to the account's address.
+  local i="$1" got j other
+  local name="${names[$i]}" addr="${addrs[$i]}" dir="${dirs[$i]}"
+  if [ -n "$skip_check" ]; then
+    echo "!! SIGN-IN CHECK SKIPPED (--no-sign-in-check): nothing proves $(shown "$dir") is signed in to $name${addr:+, $addr}. This session may spend another account's week." >&2
+    return 0
+  fi
+  if [ -z "$addr" ]; then
+    echo "!! account $name has no address in $machine, so its sign-in isn't checked. Add a line: $name <address> ${dir:-default}" >&2
+    return 0
+  fi
+  got="$(signed_in_as "$dir")"
+  if [ "$(lower "$got")" != "$(lower "$addr")" ]; then
+    echo "refusing to start: account $name is $addr, but its folder $(shown "$dir") is $(state "$got")."
+    for j in "${!names[@]}"; do
+      [ "$j" = "$i" ] && continue
+      other="$(signed_in_as "${dirs[$j]}")"
+      echo "  account ${names[$j]} (${addrs[$j]:-no address}): its folder $(shown "${dirs[$j]}") is $(state "$other")"
+    done
+    echo "Sign in there yourself, at the machine: end every session using $(shown "$dir"), run ${dir:+CLAUDE_CONFIG_DIR=$dir }claude, then /login as $addr. If the address in $machine is wrong, correct it there."
+    exit 3
+  fi
+  two_logins "$dir" "$name"
+}
+# --- end of the accounts block ---
+
+account=""; skip_check=""; check_only=""
+while [ $# -gt 0 ]; do
+  case "$1" in
+    --account) account="${2:-}"; shift 2 ;;
+    --no-sign-in-check) skip_check=1; shift ;;
+    --check-accounts) check_only=1; shift ;;
+    *) sed -n '2,12p' "$0"; exit 2 ;;
   esac
-fi
-config=""; found=""
-for pair in $accounts; do
-  if [ "${pair%%=*}" = "$account" ]; then found=1; config="${pair#*=}"; fi
 done
-[ -n "$found" ] || { echo "unknown account: $account (have: $accounts)"; exit 2; }
-config="${config/#\~/$HOME}"
-if [ -n "$config" ]; then
-  [ -d "$config" ] || { echo "account $account isn't set up: $config is missing"; exit 2; }
-  export CLAUDE_CONFIG_DIR="$config"
-else
-  unset CLAUDE_CONFIG_DIR
+load_accounts
+
+if [ -n "$check_only" ]; then
+  rc=0
+  for i in "${!names[@]}"; do
+    got="$(signed_in_as "${dirs[$i]}")"
+    if [ -z "${addrs[$i]}" ]; then verdict="no address to check against"
+    elif [ "$(lower "$got")" = "$(lower "${addrs[$i]}")" ]; then verdict="ok"
+    else verdict="MISMATCH"; rc=3; fi
+    echo "${names[$i]}, ${addrs[$i]:-no address}: $(shown "${dirs[$i]}") is $(state "$got"): $verdict"
+    two_logins "${dirs[$i]}" "${names[$i]}"
+  done
+  exit $rc
 fi
+
+if [ -z "$account" ]; then
+  if [ ${#names[@]} -eq 1 ]; then
+    account="${names[0]}"
+  else
+    # Asking needs a terminal; without one, say how to choose and stop. Never guess.
+    if [ ! -t 0 ]; then echo "No account given. Start the boss with --account <name>, one of:"; show_accounts; exit 2; fi
+    echo "Which account does the boss run on? Its workers follow it."
+    show_accounts
+    read -r -p "Account name: " account
+  fi
+fi
+i="$(index_of "$account")" || { echo "unknown account: ${account:-(none)}. Known accounts:"; show_accounts; exit 2; }
+address="${addrs[$i]}"; config="${dirs[$i]}"
+if [ -n "$config" ] && [ ! -d "$config" ]; then echo "account $account isn't set up: $config is missing"; exit 2; fi
+check_signin "$i"
+
+# One account per project: the worker launcher reads this and runs workers on the same account.
+export BOSS_WORKERS_ACCOUNT="$account"
+if [ -n "$config" ]; then export CLAUDE_CONFIG_DIR="$config"; else unset CLAUDE_CONFIG_DIR; fi
 cd "$root" || exit 1
 
 # The general rules are read from the installed skill, never from a copy in the project.
@@ -46,4 +159,4 @@ cfg="${CLAUDE_CONFIG_DIR:-$HOME/.claude}"
 rules="$(for f in "$cfg"/plugins/cache/*/setup/*/skills/boss-workers/reference/operating-rules.md "$cfg"/skills/boss-workers/reference/operating-rules.md; do [ -f "$f" ] && printf '%s\n' "$f"; done | sort -V | tail -1)"
 [ -n "$rules" ] || { echo "the boss-workers skill isn't installed for account $account: its operating rules are missing"; exit 2; }
 
-claude --model @BOSS_MODEL@ "You are the boss, running on account $account. Read $rules (the general operating rules, in the installed skill; its version is in the path or the plugin.json above it), then .claude/boss-workers.md and @RULES_DOC@ (this project's own), then @STATE_FILE@. If the rules' version differs from the one in your state, follow the rules' section on keeping the rules the same across projects. If @STATE_FILE@ doesn't exist yet, this is the first start: build it from the project's handoffs and state files, in the shape of the rules doc's \"The boss's state\" section, then commit it. Then read each account's limits with claude -p \"/usage\" (a non-default account with CLAUDE_CONFIG_DIR set), list the sessions still running with ListAgents, and tell me in a few lines what's running, what's next and what you need from me."
+claude --model @BOSS_MODEL@ "You are the boss, running on account $account${address:+ ($address)}. Every worker you start runs on it too: the worker launcher uses your account unless told otherwise. Read $rules (the general operating rules, in the installed skill; its version is in the path or the plugin.json above it), then .claude/boss-workers.md and @RULES_DOC@ (this project's own), then @STATE_FILE@. If the rules' version differs from the one in your state, follow the rules' section on keeping the rules the same across projects. If @STATE_FILE@ doesn't exist yet, this is the first start: build it from the project's handoffs and state files, in the shape of the rules doc's \"The boss's state\" section, then commit it. Then read the limits of $account and of each other account in $machine with claude -p \"/usage\" (CLAUDE_CONFIG_DIR set to the account's folder, unless it is default), list the sessions still running with ListAgents, and tell me in a few lines what's running, what's next and what you need from me. Always name an account by its name and address."
