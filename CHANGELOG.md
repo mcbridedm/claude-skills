@@ -2,6 +2,12 @@
 
 All notable changes to this repository are recorded here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versions are per plugin, as set in each `plugin.json`, and follow [Semantic Versioning](https://semver.org/).
 
+## setup 0.7.1 - 2026-11-21
+
+### Added
+
+- `boss-workers`, operating rules ("Under a sandbox"): a sandbox can make the worktrees of the boss's own repository read-only, so a worker there can't add, commit or switch branches. The boss tests the worktree's git folder before it starts a worker there, and tells the person where it can't write.
+
 ## setup 0.7.0 - 2026-11-19
 
 Accounts with names and addresses, one account per project at a time, and a safe switch.
