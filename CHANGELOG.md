@@ -21,6 +21,10 @@ Accounts with names and addresses, one account per project at a time, and a safe
 
 **To update a project:** write the machine file, drop `config_dir` from the profile's accounts, copy both launchers from the templates with `@ACCOUNTS@` set to the account names, and run `boss --check-accounts`. Launchers with the old `name=folder` pairs keep working; `profile-format.md`, "Moving from the old form", has the steps.
 
+### Fixed
+
+- `boss-workers`: in both launcher templates, a value option given with no value (`--account` or `--model` as the last argument) now stops with the usage. Before, the option loop's `shift 2` failed without shifting and the launcher spun forever with no output.
+
 ## setup 0.6.3 - 2026-11-16
 
 From a day with five workers at once, one of them out of the boss's reach.

@@ -112,7 +112,7 @@ check_signin() {
 account=""; skip_check=""; check_only=""
 while [ $# -gt 0 ]; do
   case "$1" in
-    --account) account="${2:-}"; shift 2 ;;
+    --account) [ $# -ge 2 ] || { sed -n '2,12p' "$0"; exit 2; }; account="$2"; shift 2 ;;
     --no-sign-in-check) skip_check=1; shift ;;
     --check-accounts) check_only=1; shift ;;
     *) sed -n '2,12p' "$0"; exit 2 ;;

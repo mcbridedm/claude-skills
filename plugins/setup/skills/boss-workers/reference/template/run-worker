@@ -116,8 +116,8 @@ check_signin() {
 model=""; account=""; skip_check=""
 while [ $# -gt 0 ]; do
   case "$1" in
-    --model) model="$2"; shift 2 ;;
-    --account) account="$2"; shift 2 ;;
+    --model) [ $# -ge 2 ] || { sed -n '2,10p' "$0"; exit 2; }; model="$2"; shift 2 ;;
+    --account) [ $# -ge 2 ] || { sed -n '2,10p' "$0"; exit 2; }; account="$2"; shift 2 ;;
     --no-sign-in-check) skip_check=1; shift ;;
     *) break ;;
   esac
