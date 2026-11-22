@@ -2,8 +2,8 @@
 # Start one headless worker session for the boss, in one folder, logging to <folder>/.claude-runs/.
 # Refuses if a worker started there still runs: two sessions in one working tree collide.
 #
-#   run-worker [--model <alias>] [--account <name>] [--no-sign-in-check] <folder> <run name> "<brief>"
-#   run-worker [--model <alias>] [--account <name>] [--no-sign-in-check] <folder> <run name> -f <brief file>
+#   run-worker [--model <alias>] [--account <name>] [--no-sign-in-check] [--outside-sandbox] <folder> <run name> "<brief>"
+#   run-worker [--model <alias>] [--account <name>] [--no-sign-in-check] [--outside-sandbox] <folder> <run name> -f <brief file>
 #
 # <folder> is relative to @WORKER_ROOT@, and is never the project root itself (the boss works there). Without --model, the
 # account's default model. Without --account, the boss's account (BOSS_WORKERS_ACCOUNT, set by the boss launcher);
@@ -113,12 +113,13 @@ check_signin() {
 }
 # --- end of the accounts block ---
 
-model=""; account=""; skip_check=""
+model=""; account=""; skip_check=""; outside=""
 while [ $# -gt 0 ]; do
   case "$1" in
     --model) [ $# -ge 2 ] || { sed -n '2,10p' "$0"; exit 2; }; model="$2"; shift 2 ;;
     --account) [ $# -ge 2 ] || { sed -n '2,10p' "$0"; exit 2; }; account="$2"; shift 2 ;;
     --no-sign-in-check) skip_check=1; shift ;;
+    --outside-sandbox) outside=1; shift ;;
     *) break ;;
   esac
 done
@@ -148,6 +149,43 @@ mkdir -p "$dir/.claude-runs"
 lock="$dir/.claude-runs/.running"
 if [ -f "$lock" ] && kill -0 "$(cat "$lock")" 2>/dev/null; then echo "a worker is still running in $dir (pid $(cat "$lock")); not starting $name"; exit 1; fi
 
+# Is this launcher inside a sandbox? (macOS: a sandbox can't be started inside another.)
+inside=""
+if command -v sandbox-exec >/dev/null 2>&1 && ! sandbox-exec -p '(version 1)(allow default)' /usr/bin/true 2>/dev/null; then inside=1; fi
+# Where the profile says the boss is sandboxed, a worker started from outside a sandbox has only its
+# shell commands sandboxed: its file tools are held by permission rules alone (the operating rules,
+# "Under a sandbox: where a worker's protection comes from"). Refuse, unless the person says so.
+sandboxed="$(awk -F': *' '/^sandboxed:/{print $2; exit}' "$profile" 2>/dev/null)"
+if [ "$sandboxed" = "true" ] && [ -z "$inside" ]; then
+  if [ -z "$outside" ]; then
+    echo "not starting $name: the profile says the boss is sandboxed, and this launcher is running outside a sandbox."
+    echo "A worker started here would have only its shell commands sandboxed, not its file tools."
+    echo "Start it from the boss, or, from your own terminal, pass --outside-sandbox and --account <name>."
+    exit 5
+  fi
+  echo "!! --outside-sandbox: $name starts outside the boss's sandbox. Missing: the operating system's wall around its file tools (Read, Write, Edit); its shell commands keep its own sandbox." >&2
+fi
+# The self-test: can a worker write its git data here? The folder where its index and HEAD live.
+gitdir="$(git -C "$dir" rev-parse --absolute-git-dir 2>/dev/null)"
+if [ -n "$gitdir" ]; then
+  probe="$gitdir/boss-workers-probe.$$"
+  if ! ( : > "$probe" ) 2>/dev/null; then
+    echo "not starting $name: a worker in $dir can't write its git data ($gitdir): no add, commit or branch there."
+    if [ -n "$inside" ]; then echo "Under a sandbox, workers of the boss's own repository work in standing clones, never worktrees of it (the operating rules, \"Under a sandbox\")."; fi
+    exit 4
+  fi
+  rm -f "$probe"
+  # A standing clone goes stale: say how far it is behind the root, so the brief's first fetch isn't forgotten.
+  if [ "$gitdir" != "$(git -C "$root" rev-parse --absolute-git-dir 2>/dev/null)" ]; then
+    roothead="$(git -C "$root" rev-parse HEAD 2>/dev/null)"
+    if behind="$(git -C "$dir" rev-list --count "HEAD..$roothead" 2>/dev/null)"; then
+      [ "$behind" = 0 ] || echo "== $name: $dir is $behind commit(s) behind the root's HEAD"
+    else
+      echo "== $name: $dir doesn't have the root's HEAD yet; the worker's first fetch brings it"
+    fi
+  fi
+fi
+
 # The project's own rules: the profile's "## Worker rules" section, up to the next heading.
 project_rules="$(awk '/^## Worker rules/{on=1; next} /^## /{on=0} on' "$profile" 2>/dev/null)"
 
@@ -157,7 +195,7 @@ $project_rules"
 # Started from inside a sandboxed shell (macOS), a worker can't start a sandbox of its own: every
 # shell command of its would fail. Only then, it runs with its own sandbox off, held by the outer one.
 settings='{"crossSessionInbound":"accept"}'
-if command -v sandbox-exec >/dev/null 2>&1 && ! sandbox-exec -p '(version 1)(allow default)' /usr/bin/true 2>/dev/null; then
+if [ -n "$inside" ]; then
   settings='{"crossSessionInbound":"accept","sandbox":{"enabled":false}}'
   echo "== $name: started inside a sandbox; the worker's own sandbox is off, the outer one confines it"
 fi

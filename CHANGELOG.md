@@ -2,6 +2,28 @@
 
 All notable changes to this repository are recorded here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versions are per plugin, as set in each `plugin.json`, and follow [Semantic Versioning](https://semver.org/).
 
+## setup 0.7.2 - 2026-11-22
+
+Under a sandbox: which arrangement a project needs, standing clones for workers of the boss's own repository, and a launcher that tests instead of assuming.
+
+### Added
+
+- `boss-workers`, operating rules ("Under a sandbox"): two facts decide where workers work (is the boss's shell sandboxed; do workers change the boss's own repository or repositories nested under its folder), with the arrangement for each. Where the boss is sandboxed and workers change its own repository, they work in standing clones the person makes, never in worktrees of it: they fetch the main branch by the root's path, branch without tracking and commit; the boss fetches each branch from the clone's path and merges in the main checkout. Proven with a worker under Claude Code 2.1.323.
+- `boss-workers`, operating rules: a worker is protected by the sandbox its whole process is started in. A session's own sandbox covers its shell commands only, so the worker launcher is never excluded from the sandbox and a worker is never started outside it to get past a refusal.
+- `boss-workers`, operating rules: the person's standing steps under a sandbox in one place; a pinned package manager must be a real install on the PATH; state kept in the git folder (claims, caches) is not shared with a clone by itself, and a hook's own tests unset what points at the shared copy; an excluded command leaves the sandbox only as a plain line of its own.
+- `boss-workers`, operating rules ("Accounts and pacing"): a sign-in belongs to the config folder, so a `/login` inside one session changes it for every session that uses the folder; a refused boss runs the check once more before sending the person to sign in.
+- `boss-workers`, profile: `sandboxed` and `workers_in`. Old profiles need no change (defaults `false` and `own`).
+- `boss-workers`, worker launcher template: a self-test before every start (it creates and removes a file where the worker's index and HEAD live, and refuses the folder with exit 4 when it can't); with `sandboxed: true` in the profile it refuses to start a worker from outside a sandbox (exit 5) unless the person passes `--outside-sandbox`, and then prints which protection is missing; it says how far a standing clone is behind the root.
+
+### Changed
+
+- `boss-workers`, operating rules: 0.7.1 said worktrees of another repository under the project are not affected by the sandbox's rule on worktrees. That line had no test behind it when written. It has one now and stands, with its limit: inside the sandbox nothing writes a nested repository's `.git/config` or `.git/hooks`.
+- `boss-workers`, setup step 5 (sandbox): records the two facts and names the arrangement; no longer recommends standing worktrees where the boss is sandboxed and workers change its own repository.
+
+### For projects already set up
+
+- Copy the worker launcher template's new blocks into the project's launcher (the `--outside-sandbox` option, the sandbox test moved up, the guard, the self-test), and add `sandboxed` and `workers_in` to the profile.
+
 ## setup 0.7.1 - 2026-11-21
 
 ### Added
