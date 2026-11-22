@@ -2,6 +2,12 @@
 
 All notable changes to this repository are recorded here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versions are per plugin, as set in each `plugin.json`, and follow [Semantic Versioning](https://semver.org/).
 
+## setup 0.7.3 - 2026-11-22
+
+### Fixed
+
+- `boss-workers`, worker launcher template and operating rules: the launcher's standing rules told every worker to commit its handoff, while 0.7.2's rule for standing clones says the handoff stays uncommitted at the clone's root. A worker reading both would commit it and it would ride into the merge. The standing rules now commit a handoff unless the project's worker rules say it stays uncommitted, and the clones rule says the project's worker rules must say so. Projects with their own launcher copy the two changed sentences.
+
 ## setup 0.7.2 - 2026-11-22
 
 Under a sandbox: which arrangement a project needs, standing clones for workers of the boss's own repository, and a launcher that tests instead of assuming.
